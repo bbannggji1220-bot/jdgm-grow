@@ -1,0 +1,145 @@
+const $ = (s, r = document) => r.querySelector(s);
+const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const page = document.body.dataset.page;
+
+/* ---------- 공통: 헤더 / 푸터 / 팝업 ---------- */
+function header() {
+  const tabs = ORDER.map(k => `<a href="${k}.html" class="${page === k ? "on " + k : ""}">${ROLES[k].name}</a>`).join("");
+  $("#hdr").innerHTML = `<div class="wrap">
+    <a class="brand" href="index.html"><img src="school-logo.png" alt="제주동여자중학교 로고"><div>${SITE.name}<small>${SITE.program}</small></div></a>
+    <nav class="tabs"><a href="index.html" class="${page === "home" ? "on" : ""}">홈</a>${tabs}</nav></div>`;
+  $("#ftr").innerHTML = `<div class="wrap"><div><b>${SITE.name}</b><br>${SITE.program} 성과 공유 사이트<br>교사·학생·학부모가 함께 GROW하는 학교<br><a href="admin.html" style="opacity:.6">관리자</a></div><img src="GROW 로고.png" alt="GROW"></div>`;
+}
+
+function modal() {
+  document.body.insertAdjacentHTML("beforeend", `<div class="modal" id="modal"><div class="sheet"><button class="x" aria-label="닫기">✕</button><div id="mbody"></div></div></div>
+    <div class="album" id="album"><button class="ax" aria-label="닫기">✕</button><button class="nav prev" aria-label="이전">‹</button><figure><img id="abig" alt=""><figcaption id="acnt"></figcaption></figure><button class="nav next" aria-label="다음">›</button><div class="astrip" id="astrip"></div></div>`);
+  const m = $("#modal"), al = $("#album");
+  m.addEventListener("click", e => {
+    if (e.target === m || e.target.closest(".x")) m.classList.remove("open");
+    if (e.target.closest(".albtn") || e.target.closest(".cover img")) openAlbum(0);
+  });
+  al.addEventListener("click", e => {
+    if (e.target === al || e.target.closest(".ax")) return al.classList.remove("open");
+    if (e.target.closest(".prev")) showAlbum(album.i - 1);
+    if (e.target.closest(".next")) showAlbum(album.i + 1);
+    const t = e.target.closest("[data-a]"); if (t) showAlbum(+t.dataset.a);
+  });
+  document.addEventListener("keydown", e => {
+    if (al.classList.contains("open")) {
+      if (e.key === "Escape") al.classList.remove("open");
+      if (e.key === "ArrowLeft") showAlbum(album.i - 1);
+      if (e.key === "ArrowRight") showAlbum(album.i + 1);
+    } else if (e.key === "Escape") m.classList.remove("open");
+  });
+}
+const album = { imgs: [], i: 0 };
+function openAlbum(i) {
+  if (!album.imgs.length) return;
+  $("#astrip").innerHTML = album.imgs.map((s, k) => `<img src="${s}" data-a="${k}" alt="">`).join("");
+  $("#album").classList.add("open");
+  showAlbum(i);
+}
+function showAlbum(i) {
+  const n = album.imgs.length;
+  album.i = (i + n) % n;
+  $("#abig").src = album.imgs[album.i];
+  $("#acnt").textContent = `${album.i + 1} / ${n}`;
+  $("#astrip").querySelectorAll("img").forEach((im, k) => im.classList.toggle("on", k === album.i));
+  $("#album").classList.toggle("single", n < 2);
+}
+function openModal({ badge, title, desc, pts, imgs, color, wide, icon }) {
+  const m = $("#modal");
+  m.style.setProperty("--accent", color || "var(--brand)");
+  album.imgs = imgs || [];
+  const text = `<span class="badge">${esc(badge)}</span><h3>${esc(title)}</h3><p class="pre">${esc(desc)}</p>` +
+    (pts && pts.length ? `<ul>${pts.map(p => `<li>${esc(p)}</li>`).join("")}</ul>` : "");
+  const n = album.imgs.length;
+  const side = n
+    ? `<div class="cover"><img src="${album.imgs[0]}" alt="대표 사진"></div><button class="btn albtn">📷 사진첩 보기 <b>${n}</b></button>`
+    : `<div class="cover empty"><span>${icon || "🖼️"}</span><small>등록된 사진이 없습니다</small></div>`;
+  $(".sheet", m).classList.toggle("wide", !!wide);
+  $("#mbody").innerHTML = wide ? `<div class="mgrid"><div class="mside">${side}</div><div class="mtext">${text}</div></div>` : text;
+  m.classList.add("open");
+}
+
+/* ---------- 홈 ---------- */
+function home() {
+  const posts = getPosts();
+  $("#logomap").addEventListener("click", e => {
+    const b = e.target.closest(".hot"); if (!b) return;
+    const g = SITE.grow[b.dataset.i];
+    openModal({ badge: `${g.l} · ${g.t}`, title: g.k, desc: g.d, pts: g.pts });
+  });
+
+  const NOW = [
+    ["01 · STUDENT", "학생의 변화", "배우는 AI → 만들어보는 AI → 활용하는 AI", "student"],
+    ["02 · TEACHER", "교사의 변화", "함께 배우고 → 함께 나누고 → 수업으로 연결", "teacher"],
+    ["03 · PARENT", "학부모의 변화", "알아가기 → 이해하기 → 함께하기", "parent"]
+  ];
+  $("#now3").innerHTML = NOW.map(n => `<a class="ncard" href="${n[3]}.html"><div class="k">${n[0]}</div><h3>${n[1]}</h3><p>${n[2]}</p><span class="go">핵심 활동 보기 →</span></a>`).join("");
+
+  const FLOW = [
+    [2, 3, "2–3월", "시작과 준비", "교육과정 협의 · 역량 강화 프로그램 · 학부모 설명회"],
+    [4, 7, "4–7월", "배우고 공유하기", "AI 연수 · 디지털 콘텐츠 · 포트폴리오 · 상반기 사례 공유"],
+    [8, 8, "8월", "밖으로 넓히기", "도외 워크숍 · AI 연수 · 학교 방문"],
+    [9, 10, "9–10월", "직접 경험하기", "AI 페스타 · 학부모 특강 · 바이브 코딩 · 자기주도학습"],
+    [11, 12, "11–12월", "성찰과 확산", "AI 연수 · 하반기 평가회 · 수업 사례 공유"]
+  ];
+  $("#flow5").innerHTML = FLOW.map((f, i) => `<button class="fcard" data-i="${i}"><div class="m">${f[2]}</div><h3>${f[3]}</h3><p>${f[4]}</p></button>`).join("");
+  $("#flow5").addEventListener("click", e => {
+    const b = e.target.closest(".fcard"); if (!b) return;
+    const f = FLOW[b.dataset.i];
+    const hit = posts.filter(p => p.s <= f[1] && p.e >= f[0]).sort((a, b) => a.s - b.s);
+    openModal({ badge: f[2], title: f[3], desc: "이 시기에 운영한 활동입니다.",
+      pts: hit.map(p => `[${ROLES[p.role].name}] ${mlabel(p)} · ${p.title}`) });
+  });
+}
+
+/* ---------- 역할 페이지: 2월~12월 타임라인 ---------- */
+function role(key) {
+  const r = ROLES[key];
+  document.documentElement.style.setProperty("--accent", r.color);
+  document.documentElement.style.setProperty("--soft", r.soft);
+  document.title = `${r.name} 성과 | ${SITE.name}`;
+  const posts = getPosts().filter(p => p.role === key).sort((a, b) => a.s - b.s || a.e - b.e);
+  const bn = getBanners()[key];
+  const hero = $("#rhero");
+  if (bn && bn.img) {
+    // mode: below(사진 아래 글자) · over(사진 위 겹치기) · none(사진만)
+    const mode = bannerMode(bn);
+    const txt = `<div class="wrap"><div><span class="pill">${r.name}</span><h1>${r.slogan}</h1><p>${r.desc}</p></div></div>`;
+    const img = `background-image:url('${bn.img}');background-position:center ${bn.pos == null ? 50 : bn.pos}%`;
+    hero.className = "rhero banner " + mode;
+    hero.innerHTML = `<div class="bnimg" style="${img}">${mode === "over" ? txt : ""}</div>${mode === "below" ? txt : ""}`;
+  } else {
+    hero.innerHTML = `<div class="wrap"><div><span class="pill">${r.name}</span><h1>${r.slogan}</h1><p>${r.desc}</p></div>
+    <div class="emoji">${r.icon}</div></div>`;
+  }
+
+  const MS = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+  const axis = MS.map(m => `<div class="mth">${m}월</div>`).join("");
+  const lanes = posts.map((p, i) => {
+    const col = `${p.s - 1} / ${p.e}`;
+    const range = p.e > p.s;
+    const right = 12 - p.e >= 3, left = p.s - 2 >= 3;
+    let lab;
+    if (right) lab = `<div class="lab" style="grid-column:${p.e} / 12;grid-row:1">${esc(p.title)}</div>`;
+    else if (left) lab = `<div class="lab l" style="grid-column:1 / ${p.s - 1};grid-row:1">${esc(p.title)}</div>`;
+    else lab = `<div class="lab u" style="grid-column:1 / -1;grid-row:2">${esc(p.title)}</div>`;
+    const hasImg = p.imgs && p.imgs.length ? " 📷" : "";
+    return `<div class="lane"><div class="pinwrap ${range ? "range" : ""}" style="grid-column:${col};grid-row:1"><button class="pin" data-id="${esc(p.id)}" title="${esc(p.title)}"><span>📌</span></button></div>${lab.replace("</div>", hasImg + "</div>")}</div>`;
+  }).join("");
+  $("#tl").innerHTML = posts.length
+    ? `<div class="tl"><div class="axis">${axis}</div><div class="lanes">${lanes}</div></div>`
+    : `<p style="text-align:center;color:var(--muted)">등록된 성과가 없습니다.</p>`;
+  $("#tl").addEventListener("click", e => {
+    const b = e.target.closest(".pin"); if (!b) return;
+    const p = posts.find(x => x.id === b.dataset.id);
+    openModal({ badge: mlabel(p), title: p.title, desc: p.desc, pts: p.pts, imgs: p.imgs, color: r.color, wide: true, icon: r.icon });
+  });
+
+  $("#others").innerHTML = ORDER.filter(k => k !== key).map(k => `<a class="btn ghost" href="${k}.html">${ROLES[k].icon} ${ROLES[k].name} 성과 보기</a>`).join("");
+}
+
+if (page) { header(); modal(); if (page === "home") home(); else role(page); }
