@@ -340,7 +340,7 @@ window.PUBLISHED_BANNERS = {
   "mode": "over"
  },
  "parent": {
-  "pos": 50,
+  "pos": 87,
   "mode": "below",
   "img": "photos/mup68x4a-d8utxt.jpg"
  }
