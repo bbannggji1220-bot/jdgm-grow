@@ -159,7 +159,10 @@ window.PUBLISHED_POSTS = [
    "Gemini",
    "연수"
   ],
-  "imgs": []
+  "imgs": [
+   "photos/mup61iph-rk24za.jpg",
+   "photos/mup61ju0-fsgwdi.jpg"
+  ]
  },
  {
   "id": "teacher-2",
