@@ -145,3 +145,12 @@
 .bnhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
 .bnprev{aspect-ratio:16/3;border-radius:10px;background-size:cover;margin-bottom:10px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:14px}
 .bnprev.empty{border:1px dashed var(--line)}
+/* 관리자: GitHub 저장 */
+.ghok{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;border-color:rgba(46,160,67,.35);background:rgba(46,160,67,.1)}
+.steps{margin:0 0 14px 20px;display:grid;gap:6px;font-size:14px;line-height:1.6}
+.steps a{color:var(--brand);font-weight:700}
+.busy{position:fixed;inset:0;background:rgba(15,20,40,.45);display:none;align-items:center;justify-content:center;z-index:200}
+.busy.on{display:flex}
+.busy>div{background:var(--surface);border-radius:16px;padding:22px 28px;display:flex;gap:14px;align-items:center;font-weight:700;box-shadow:0 10px 40px rgba(0,0,0,.2)}
+.busy i{width:22px;height:22px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--brand);animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
