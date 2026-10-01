@@ -338,5 +338,10 @@ window.PUBLISHED_BANNERS = {
   "pos": 51,
   "img": "photos/banner-teacher.jpg",
   "mode": "over"
+ },
+ "parent": {
+  "pos": 50,
+  "mode": "below",
+  "img": "photos/mup68x4a-d8utxt.jpg"
  }
 };
