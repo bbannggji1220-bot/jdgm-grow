@@ -341,7 +341,7 @@ window.PUBLISHED_BANNERS = {
  },
  "parent": {
   "pos": 87,
-  "mode": "below",
+  "mode": "over",
   "img": "photos/mup68x4a-d8utxt.jpg"
  }
 };
