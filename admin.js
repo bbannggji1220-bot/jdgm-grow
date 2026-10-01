@@ -110,7 +110,7 @@ function ghBox() {
       <li><a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">GitHub 토큰 만들기 페이지</a>를 엽니다. (<b>bbannggji1220-bot</b> 계정으로 로그인)</li>
       <li><b>Token name</b>: 아무 이름 (예: 성과사이트) · <b>Expiration</b>: 원하는 기간 (예: 1년)</li>
       <li><b>Repository access</b> → <b>Only select repositories</b> → <b>jdgm-grow</b> 선택</li>
-      <li><b>Permissions</b> → <b>Repository permissions</b> → <b>Contents</b> 를 <b>Read and write</b> 로</li>
+      <li><b>Permissions</b> → <b>Add permissions</b> → 검색창에 <b>Contents</b> 입력 후 체크 → 추가된 Contents 줄에서 <b>Read and write</b> 선택 (Metadata 는 자동으로 붙으니 그대로 두기)</li>
       <li>맨 아래 <b>Generate token</b> → 나온 <code>github_pat_…</code> 를 복사해 아래에 붙여넣기</li>
     </ol>
     <div class="f"><input type="password" id="tk" placeholder="github_pat_로 시작하는 토큰"></div>
