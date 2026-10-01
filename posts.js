@@ -286,7 +286,10 @@ window.PUBLISHED_POSTS = [
    "선도학교 안내",
    "협조사항"
   ],
-  "imgs": []
+  "imgs": [
+   "photos/mup64ktd-21o09x.jpg",
+   "photos/mup64lxa-80x3w7.jpg"
+  ]
  },
  {
   "id": "parent-1",
