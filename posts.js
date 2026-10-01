@@ -305,7 +305,10 @@ window.PUBLISHED_POSTS = [
    "특강",
    "자녀 교육"
   ],
-  "imgs": []
+  "imgs": [
+   "photos/mup65ew7-658xhi.jpg",
+   "photos/mup65g8q-tsw8o2.jpg"
+  ]
  },
  {
   "id": "parent-2",
