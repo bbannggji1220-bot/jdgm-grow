@@ -143,7 +143,9 @@ window.PUBLISHED_POSTS = [
    "교육과정 수립 주간",
    "협의회"
   ],
-  "imgs": []
+  "imgs": [
+   "photos/mup63jwx-w6nvrh.jpg"
+  ]
  },
  {
   "id": "teacher-1",
