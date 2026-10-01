@@ -287,6 +287,7 @@ window.PUBLISHED_POSTS = [
    "협조사항"
   ],
   "imgs": [
+   "photos/mup68eja-4mw0g0.jpg",
    "photos/mup64ktd-21o09x.jpg",
    "photos/mup64lxa-80x3w7.jpg"
   ]
