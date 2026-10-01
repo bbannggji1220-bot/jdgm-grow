@@ -216,7 +216,19 @@ window.PUBLISHED_POSTS = [
    "클래스팅 AI",
    "창덕여자중학교"
   ],
-  "imgs": []
+  "imgs": [
+   "photos/muouokqr-nve946.jpg",
+   "photos/muouolyo-hxpjeu.jpg",
+   "photos/muouon6u-9psr35.jpg",
+   "photos/muouoogf-2l8tcs.jpg",
+   "photos/muouopn1-nmp9vf.jpg",
+   "photos/muouoqfk-qk19el.jpg",
+   "photos/muouorjc-pqrwmz.jpg",
+   "photos/muouosbp-rrektn.jpg",
+   "photos/muouothh-s2u24o.jpg",
+   "photos/muououry-sw09ku.jpg",
+   "photos/muouovsv-ubuazu.jpg"
+  ]
  },
  {
   "id": "teacher-5",
