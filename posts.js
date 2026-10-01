@@ -164,7 +164,8 @@ window.PUBLISHED_POSTS = [
   "imgs": [
    "photos/mup61iph-rk24za.jpg",
    "photos/mup61ju0-fsgwdi.jpg"
-  ]
+  ],
+  "cpos": 1
  },
  {
   "id": "teacher-2",
