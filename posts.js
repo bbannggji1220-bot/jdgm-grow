@@ -321,7 +321,7 @@ window.PUBLISHED_BANNERS = {
  },
  "teacher": {
   "pos": 51,
-  "text": true,
-  "img": "photos/banner-teacher.jpg"
+  "img": "photos/banner-teacher.jpg",
+  "mode": "over"
  }
 };
