@@ -57,7 +57,7 @@ function openModal({ badge, title, desc, pts, imgs, color, wide, icon }) {
   const n = album.imgs.length;
   const side = n
     ? `<div class="cover"><img src="${album.imgs[0]}" alt="대표 사진"></div><button class="btn albtn">📷 사진첩 보기 <b>${n}</b></button>`
-    : `<div class="cover empty"><span>${icon || "🖼️"}</span><small>등록된 사진이 없습니다</small></div>`;
+    : `<div class="cover empty"><span>${icon || "🖼️"}</span><small>사진이 업로드될 예정입니다</small></div>`;
   $(".sheet", m).classList.toggle("wide", !!wide);
   $("#mbody").innerHTML = wide ? `<div class="mgrid"><div class="mside">${side}</div><div class="mtext">${text}</div></div>` : text;
   m.classList.add("open");
