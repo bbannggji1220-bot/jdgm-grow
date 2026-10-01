@@ -22,6 +22,9 @@ function getBanners() { return window.PUBLISHED_BANNERS || {}; }
 // 예전 형식(text: false)도 읽을 수 있게 변환
 function bannerMode(b) { return b.mode || (b.text === false ? "none" : "below"); }
 
+// 대표 사진에서 보일 위치(0~100). 잘리는 방향(가로·세로)에만 적용됩니다.
+const coverPos = v => `object-position:${v == null ? 50 : v}% ${v == null ? 50 : v}%`;
+
 function postsJs(posts, banners) {
   return "// 관리자 페이지에서 저장한 게시본\nwindow.PUBLISHED_POSTS = " + JSON.stringify(posts, null, 1) +
     ";\nwindow.PUBLISHED_BANNERS = " + JSON.stringify(banners, null, 1) + ";\n";

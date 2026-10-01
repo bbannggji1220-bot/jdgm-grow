@@ -143,7 +143,7 @@ function render() {
     <div class="f"><label>내용</label><textarea id="desc" placeholder="활동 내용과 성과를 자유롭게 작성하세요">${esc(c.desc)}</textarea></div>
     <div class="f"><label>핵심 성과 (한 줄에 하나)</label><textarea id="pts" style="min-height:80px">${esc(c.pts.join("\n"))}</textarea></div>
     <div class="f"><label>키워드 (쉼표로 구분)</label><input id="kw" value="${esc(c.kw.join(", "))}"></div>
-    <div class="f"><label>사진 (여러 장 가능 · 첫 번째 사진이 대표 사진 · 사진을 끌어서 순서 변경)</label><input type="file" id="files" accept="image/*" multiple><div class="thumbs" id="thumbs"></div></div>
+    <div class="f"><label>사진 (여러 장 가능 · 첫 번째 사진이 대표 사진 · 사진을 끌어서 순서 변경)</label><input type="file" id="files" accept="image/*" multiple><div class="thumbs" id="thumbs"></div><div id="cposBox"></div></div>
     <div class="bar2"><button class="btn primary" id="save">저장</button><button class="btn ghost" id="new">새로 작성</button></div>
   </div>
   <div class="box"><h2>등록된 성과 (${posts.length})</h2>
@@ -182,7 +182,23 @@ function render() {
   }
 
   // 사진
-  const th = () => { $("#thumbs").innerHTML = c.imgs.map((s, i) => `<div draggable="true" data-i="${i}" title="끌어서 순서 바꾸기"><img src="${src(s)}" draggable="false"><button class="rm" data-r="${i}">✕</button>${i === 0 ? '<span class="cv on">대표</span>' : `<button class="cv" data-c="${i}">대표로</button>`}</div>`).join(""); };
+  const th = () => { $("#thumbs").innerHTML = c.imgs.map((s, i) => `<div draggable="true" data-i="${i}" title="끌어서 순서 바꾸기"><img src="${src(s)}" draggable="false"><button class="rm" data-r="${i}">✕</button>${i === 0 ? '<span class="cv on">대표</span>' : `<button class="cv" data-c="${i}">대표로</button>`}</div>`).join(""); cp(); };
+  // 대표 사진이 팝업에서 잘리는 위치 조절 (대표 사진이 바뀌면 가운데로 초기화)
+  let lastCover = c.imgs[0];
+  const cp = () => {
+    const box = $("#cposBox");
+    if (!c.imgs.length) { box.innerHTML = ""; return; }
+    if (c.imgs[0] !== lastCover) { lastCover = c.imgs[0]; delete c.cpos; delete c.cfit; }
+    const v = c.cpos == null ? 50 : c.cpos;
+    box.innerHTML = `<div class="cpos"><div class="cover${c.cfit ? " fit" : ""}"><img src="${src(c.imgs[0])}" style="${c.cfit ? "" : coverPos(v)}" alt="대표 사진 미리보기"></div>
+      <div><label class="note"><b>대표 사진 보이는 위치</b> · 팝업에서 잘리는 부분을 조절합니다</label>
+      <input type="range" id="cp" min="0" max="100" value="${v}" ${c.cfit ? "disabled" : ""}>
+      <div class="note" style="display:flex;justify-content:space-between"><span>위 / 왼쪽</span><span>가운데</span><span>아래 / 오른쪽</span></div>
+      <label class="note" style="display:block;margin-top:10px"><input type="checkbox" id="cfit" ${c.cfit ? "checked" : ""}> 사진 전체 보이기 (잘리지 않게 · 포스터처럼 긴 사진에 추천)</label></div></div>`;
+    const im = $("#cposBox img");
+    $("#cp").oninput = e => { c.cpos = +e.target.value; im.style.cssText = coverPos(c.cpos); };
+    $("#cfit").onchange = e => { if (e.target.checked) c.cfit = true; else delete c.cfit; cp(); };
+  };
   th();
   $("#thumbs").onclick = e => {
     const b = e.target.closest("[data-r]"); if (b) { c.imgs.splice(+b.dataset.r, 1); th(); }

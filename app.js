@@ -48,7 +48,7 @@ function showAlbum(i) {
   $("#astrip").querySelectorAll("img").forEach((im, k) => im.classList.toggle("on", k === album.i));
   $("#album").classList.toggle("single", n < 2);
 }
-function openModal({ badge, title, desc, pts, imgs, color, wide, icon }) {
+function openModal({ badge, title, desc, pts, imgs, color, wide, icon, cpos, cfit }) {
   const m = $("#modal");
   m.style.setProperty("--accent", color || "var(--brand)");
   album.imgs = imgs || [];
@@ -56,7 +56,7 @@ function openModal({ badge, title, desc, pts, imgs, color, wide, icon }) {
     (pts && pts.length ? `<ul>${pts.map(p => `<li>${esc(p)}</li>`).join("")}</ul>` : "");
   const n = album.imgs.length;
   const side = n
-    ? `<div class="cover"><img src="${album.imgs[0]}" alt="대표 사진"></div><button class="btn albtn">📷 사진첩 보기 <b>${n}</b></button>`
+    ? `<div class="cover${cfit ? " fit" : ""}"><img src="${album.imgs[0]}" alt="대표 사진" style="${cfit ? "" : coverPos(cpos)}"></div><button class="btn albtn">📷 사진첩 보기 <b>${n}</b></button>`
     : `<div class="cover empty"><span>${icon || "🖼️"}</span><small>사진이 업로드될 예정입니다</small></div>`;
   $(".sheet", m).classList.toggle("wide", !!wide);
   $("#mbody").innerHTML = wide ? `<div class="mgrid"><div class="mside">${side}</div><div class="mtext">${text}</div></div>` : text;
@@ -136,7 +136,7 @@ function role(key) {
   $("#tl").addEventListener("click", e => {
     const b = e.target.closest(".pin"); if (!b) return;
     const p = posts.find(x => x.id === b.dataset.id);
-    openModal({ badge: mlabel(p), title: p.title, desc: p.desc, pts: p.pts, imgs: p.imgs, color: r.color, wide: true, icon: r.icon });
+    openModal({ badge: mlabel(p), title: p.title, desc: p.desc, pts: p.pts, imgs: p.imgs, color: r.color, wide: true, icon: r.icon, cpos: p.cpos, cfit: p.cfit });
   });
 
   $("#others").innerHTML = ORDER.filter(k => k !== key).map(k => `<a class="btn ghost" href="${k}.html">${ROLES[k].icon} ${ROLES[k].name} 성과 보기</a>`).join("");
