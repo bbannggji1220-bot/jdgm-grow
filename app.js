@@ -33,7 +33,7 @@ function modal() {
     } else if (e.key === "Escape") m.classList.remove("open");
   });
 }
-const album = { imgs: [], i: 0 };
+const album = { imgs: [], caps: [], i: 0 };
 function openAlbum(i) {
   if (!album.imgs.length) return;
   $("#astrip").innerHTML = album.imgs.map((s, k) => `<img src="${s}" data-a="${k}" alt="">`).join("");
@@ -44,14 +44,15 @@ function showAlbum(i) {
   const n = album.imgs.length;
   album.i = (i + n) % n;
   $("#abig").src = album.imgs[album.i];
-  $("#acnt").textContent = `${album.i + 1} / ${n}`;
+  const cap = album.caps[album.i];
+  $("#acnt").textContent = (cap ? cap + "  ·  " : "") + `${album.i + 1} / ${n}`;
   $("#astrip").querySelectorAll("img").forEach((im, k) => im.classList.toggle("on", k === album.i));
   $("#album").classList.toggle("single", n < 2);
 }
 function openModal({ badge, title, desc, pts, imgs, color, wide, icon, cpos, cfit }) {
   const m = $("#modal");
   m.style.setProperty("--accent", color || "var(--brand)");
-  album.imgs = imgs || [];
+  album.imgs = imgs || []; album.caps = [];
   const text = `<span class="badge">${esc(badge)}</span><h3>${esc(title)}</h3><p class="pre">${esc(desc)}</p>` +
     (pts && pts.length ? `<ul>${pts.map(p => `<li>${esc(p)}</li>`).join("")}</ul>` : "");
   const n = album.imgs.length;
@@ -139,7 +140,33 @@ function role(key) {
     openModal({ badge: mlabel(p), title: p.title, desc: p.desc, pts: p.pts, imgs: p.imgs, color: r.color, wide: true, icon: r.icon, cpos: p.cpos, cfit: p.cfit });
   });
 
+  if ($("#cases-sec")) cases();
+
   $("#others").innerHTML = ORDER.filter(k => k !== key).map(k => `<a class="btn ghost" href="${k}.html">${ROLES[k].icon} ${ROLES[k].name} 성과 보기</a>`).join("");
+}
+
+/* ---------- 교사 페이지: 과목별 수업 사례 포스터 ---------- */
+function cases() {
+  const list = getCases();
+  if (!list.length) return $("#cases-sec").remove();
+  let cur = (list.find(c => c.posters.length) || list[0]).id;
+  const draw = () => {
+    const c = list.find(x => x.id === cur);
+    $("#ctabs").innerHTML = list.map(x => `<button class="ctab${x.id === cur ? " on" : ""}" role="tab" aria-selected="${x.id === cur}" data-c="${x.id}">${esc(x.name)}${x.posters.length ? ` <small>${x.posters.length}</small>` : ""}</button>`).join("");
+    $("#cgrid").innerHTML = c.posters.length
+      ? c.posters.map((p, i) => `<button class="cpost" data-p="${i}"><span class="cimg"><img src="${p.img}" alt="${esc(p.title || c.name + " 수업 사례 포스터")}" loading="lazy"></span>
+        ${p.title || p.teacher ? `<span class="ccap">${p.title ? `<b>${esc(p.title)}</b>` : ""}${p.teacher ? `<small>${esc(p.teacher)}</small>` : ""}</span>` : ""}</button>`).join("")
+      : `<div class="cempty"><span>🗂️</span>${esc(c.name)} 수업 사례 포스터가 곧 올라올 예정입니다.</div>`;
+  };
+  draw();
+  $("#ctabs").addEventListener("click", e => { const b = e.target.closest("[data-c]"); if (b) { cur = b.dataset.c; draw(); } });
+  $("#cgrid").addEventListener("click", e => {
+    const b = e.target.closest("[data-p]"); if (!b) return;
+    const c = list.find(x => x.id === cur);
+    album.imgs = c.posters.map(p => p.img);
+    album.caps = c.posters.map(p => [p.title, p.teacher].filter(Boolean).join(" · "));
+    openAlbum(+b.dataset.p);
+  });
 }
 
 if (page) { header(); modal(); if (page === "home") home(); else role(page); }

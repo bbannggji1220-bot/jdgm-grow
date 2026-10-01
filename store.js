@@ -25,9 +25,14 @@ function bannerMode(b) { return b.mode || (b.text === false ? "none" : "below");
 // 대표 사진에서 보일 위치(0~100). 잘리는 방향(가로·세로)에만 적용됩니다.
 const coverPos = v => `object-position:${v == null ? 50 : v}% ${v == null ? 50 : v}%`;
 
-function postsJs(posts, banners) {
+// 교사 수업 사례 공유: [{ id, name(과목), posters: [{ img, title, teacher }] }, ...]
+const seedCases = () => CASE_SUBJECTS.map((name, i) => ({ id: "c" + i, name, posters: [] }));
+function getCases() { return window.PUBLISHED_CASES || seedCases(); }
+
+function postsJs(posts, banners, cases) {
   return "// 관리자 페이지에서 저장한 게시본\nwindow.PUBLISHED_POSTS = " + JSON.stringify(posts, null, 1) +
-    ";\nwindow.PUBLISHED_BANNERS = " + JSON.stringify(banners, null, 1) + ";\n";
+    ";\nwindow.PUBLISHED_BANNERS = " + JSON.stringify(banners, null, 1) +
+    ";\nwindow.PUBLISHED_CASES = " + JSON.stringify(cases, null, 1) + ";\n";
 }
 
 // 예전 방식(브라우저 임시 저장)으로 남아 있는 작업본

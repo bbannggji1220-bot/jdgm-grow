@@ -130,7 +130,7 @@
 
 /* 분야별 상단 배너 (유튜브 채널 배너형) */
 .rhero.banner{padding:0}
-.rhero.banner .bnimg{position:relative;background-size:cover;background-repeat:no-repeat;aspect-ratio:16/3;min-height:160px}
+.rhero.banner .bnimg{position:relative;width:100%;background-size:cover;background-repeat:no-repeat;aspect-ratio:16/3;min-height:160px}
 /* 사진 아래 글자: 기존 연한 배경 위에 그대로 → 항상 잘 보임 */
 .rhero.banner.below>.wrap{display:block;padding-top:28px;padding-bottom:36px}
 /* 사진 위 겹치기: 아래·왼쪽을 진하게 어둡게 + 글자 그림자 */
@@ -164,3 +164,32 @@
 .cpos .cover img:hover{transform:none}
 .cpos input[type=range]{width:100%}
 @media (max-width:560px){.cpos{grid-template-columns:1fr}}
+
+/* ===== 교사 수업 사례 공유 (과목 탭 · 포스터) ===== */
+.cases{padding-top:24px}
+.ctabs{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.ctab{font:inherit;font-weight:800;font-size:15px;padding:10px 18px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;transition:.2s}
+.ctab:hover{border-color:var(--accent,var(--brand));color:var(--accent,var(--brand))}
+.ctab.on{background:var(--accent,var(--brand));border-color:var(--accent,var(--brand));color:#fff}
+.ctab small{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 6px;margin-left:4px;border-radius:999px;font-size:11px;background:var(--soft,var(--bg));color:var(--accent,var(--brand))}
+.ctab.on small{background:#fff}
+.cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:22px;margin-top:30px}
+.cpost{font:inherit;color:inherit;text-align:left;padding:0;border:1px solid var(--line);background:var(--surface);border-radius:20px;overflow:hidden;cursor:zoom-in;box-shadow:var(--shadow);transition:.25s;display:flex;flex-direction:column}
+.cpost:hover{transform:translateY(-5px);border-color:var(--accent,var(--brand))}
+.cimg{display:block;aspect-ratio:3/4;background:var(--bg);padding:10px}
+.cimg img{width:100%;height:100%;object-fit:contain;display:block}
+.ccap{display:grid;gap:2px;padding:14px 16px 16px;border-top:1px solid var(--line)}
+.ccap b{font-size:15px;line-height:1.4}
+.ccap small{color:var(--muted);font-weight:700;font-size:13px}
+.cempty{grid-column:1 / -1;display:grid;justify-items:center;gap:8px;padding:56px 20px;border:2px dashed var(--line);border-radius:20px;color:var(--muted);font-weight:700;text-align:center}
+.cempty span{font-size:44px}
+@media (max-width:560px){.cgrid{grid-template-columns:repeat(2,1fr);gap:12px}.cimg{padding:6px}.ccap{padding:10px 12px 12px}.ccap b{font-size:13px}.ctab{font-size:14px;padding:8px 14px}}
+/* 관리자: 수업 사례 */
+#casesBox .ctabs{justify-content:flex-start}
+.cposters{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px}
+.cpitem{display:grid;gap:6px;border:1px solid var(--line);border-radius:14px;padding:10px}
+.cpitem img{width:100%;aspect-ratio:3/4;object-fit:contain;background:var(--bg);border-radius:8px}
+.cpitem input{font:inherit;font-size:13px;padding:7px 10px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink);width:100%}
+.cpitem .bar2{margin:0;gap:6px}
+.cpitem .btn{padding:5px 10px;font-size:12px}
+.btn:disabled{opacity:.4;cursor:default;transform:none}
