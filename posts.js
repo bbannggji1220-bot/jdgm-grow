@@ -178,7 +178,10 @@ window.PUBLISHED_POSTS = [
    "노트북LM",
    "연수"
   ],
-  "imgs": []
+  "imgs": [
+   "photos/mup62fgr-en9r9x.jpg",
+   "photos/mup62go9-kw6y5n.jpg"
+  ]
  },
  {
   "id": "teacher-3",
