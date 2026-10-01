@@ -316,8 +316,8 @@ window.PUBLISHED_POSTS = [
 window.PUBLISHED_BANNERS = {
  "student": {
   "pos": 48,
-  "text": true,
-  "img": "photos/banner-student.jpg"
+  "img": "photos/banner-student.jpg",
+  "mode": "over"
  },
  "teacher": {
   "pos": 51,
