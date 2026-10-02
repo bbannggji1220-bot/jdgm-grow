@@ -387,11 +387,6 @@ window.PUBLISHED_CASES = [
   "posters": []
  },
  {
-  "id": "c5",
-  "name": "도덕",
-  "posters": []
- },
- {
   "id": "c6",
   "name": "과학",
   "posters": []
