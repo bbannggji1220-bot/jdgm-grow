@@ -207,7 +207,8 @@
 .ctool+.cgrid{margin-top:16px}
 .ctool{border:1px solid var(--line);border-radius:18px;padding:18px 20px;background:var(--bg)}
 .ctop{display:flex;align-items:center;gap:12px;margin-bottom:10px}
-.ctop img,.clogo{width:52px;height:52px;flex:none;border-radius:14px;border:1px solid var(--line);background:#fff;object-fit:contain}
+.ctop img,.clogo{width:52px;height:52px;flex:none;border-radius:14px;object-fit:cover;display:block}
+.clogo{border:1px solid var(--line)}
 .clogo{display:grid;place-items:center;font-size:26px;background:var(--soft,var(--surface))}
 .ctop b{font-size:17px;line-height:1.35}
 .ctool p{white-space:pre-wrap;color:var(--muted);font-size:14.5px;line-height:1.75}
@@ -217,7 +218,7 @@
 .ctlist{display:grid;gap:12px}
 .ctitem{display:grid;grid-template-columns:100px 1fr;gap:12px;border:1px solid var(--line);border-radius:14px;padding:12px}
 .ctlogo{position:relative;display:grid;justify-items:center;align-content:start;gap:6px}
-.ctlogo img,.ctlogo span{width:80px;height:80px;border-radius:12px;background:var(--bg);object-fit:contain;display:grid;place-items:center;font-size:32px}
+.ctlogo img,.ctlogo span{width:80px;height:80px;border-radius:12px;background:var(--bg);object-fit:cover;display:grid;place-items:center;font-size:32px}
 .ctlogo label{cursor:pointer;color:var(--brand);font-weight:700}
 .ctlogo .rm{position:absolute;right:2px;top:-6px;width:22px;height:22px;border-radius:50%;border:0;background:#e5484d;color:#fff;cursor:pointer;font-size:12px}
 .ctfields{display:grid;gap:6px}
