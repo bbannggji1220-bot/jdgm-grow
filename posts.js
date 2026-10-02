@@ -494,7 +494,8 @@ window.PUBLISHED_TOOLS = [
   "name": "체리스쿨",
   "desc": "",
   "url": "https://www.mise.team/",
-  "posters": []
+  "posters": [],
+  "img": "photos/muqi55pz-drmlg1.jpg"
  },
  {
   "id": "tmuqhz4wr",
