@@ -427,6 +427,12 @@ window.PUBLISHED_CASES = [
  {
   "id": "c11",
   "name": "미술",
-  "posters": []
+  "posters": [
+   {
+    "img": "photos/muq9vmn6-1vahxo.jpg",
+    "title": "생성형 AI 기반 서양 미술 감상과 시각화 프로젝트",
+    "teacher": "문유지"
+   }
+  ]
  }
 ];
