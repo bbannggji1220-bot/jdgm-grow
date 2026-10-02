@@ -25,7 +25,8 @@ function bannerMode(b) { return b.mode || (b.text === false ? "none" : "below");
 // 대표 사진에서 보일 위치(0~100). 잘리는 방향(가로·세로)에만 적용됩니다.
 const coverPos = v => `object-position:${v == null ? 50 : v}% ${v == null ? 50 : v}%`;
 
-// 교사 수업 사례 공유: [{ id, name(과목), posters: [{ img, title, teacher }] }, ...]
+// 교사 수업 사례 공유: [{ id, name(과목), posters: [{ img, title, teacher }], tools(AI 코스웨어): [{ name, desc, url, img }] }, ...]
+const webUrl = u => /^https?:\/\//i.test(u) ? u : "https://" + u;
 const seedCases = () => CASE_SUBJECTS.map((name, i) => ({ id: "c" + i, name, posters: [] }));
 function getCases() { return window.PUBLISHED_CASES || seedCases(); }
 

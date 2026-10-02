@@ -193,3 +193,34 @@
 .cpitem .bar2{margin:0;gap:6px}
 .cpitem .btn{padding:5px 10px;font-size:12px}
 .btn:disabled{opacity:.4;cursor:default;transform:none}
+/* 수업 사례: 왼쪽 포스터 · 오른쪽 AI 코스웨어 */
+.csplit{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:30px;align-items:start}
+.cpanel{background:var(--surface);border:1px solid var(--line);border-radius:24px;padding:24px;box-shadow:var(--shadow)}
+.cpanel h3{font-size:19px;font-weight:900;margin-bottom:16px}
+.cpanel h3 small{font-size:12px;color:var(--muted);font-weight:600;margin-left:6px}
+.csplit .cgrid{margin-top:0;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px}
+.csplit .cgrid.one{grid-template-columns:minmax(0,400px);justify-content:center}
+.csplit .cpost{box-shadow:none}
+.csplit .cempty{padding:40px 16px}
+.ctools{display:grid;gap:14px}
+.ctool{border:1px solid var(--line);border-radius:18px;padding:18px 20px;background:var(--bg)}
+.ctop{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.ctop img,.clogo{width:52px;height:52px;flex:none;border-radius:14px;border:1px solid var(--line);background:#fff;object-fit:contain}
+.clogo{display:grid;place-items:center;font-size:26px;background:var(--soft,var(--surface))}
+.ctop b{font-size:17px;line-height:1.35}
+.ctool p{white-space:pre-wrap;color:var(--muted);font-size:14.5px;line-height:1.75}
+.ctool .btn{margin-top:12px;padding:8px 14px;font-size:13px}
+@media (max-width:860px){.csplit{grid-template-columns:1fr}.cpanel{padding:18px}}
+/* 관리자: AI 코스웨어 */
+.ctlist{display:grid;gap:12px}
+.ctitem{display:grid;grid-template-columns:100px 1fr;gap:12px;border:1px solid var(--line);border-radius:14px;padding:12px}
+.ctlogo{position:relative;display:grid;justify-items:center;align-content:start;gap:6px}
+.ctlogo img,.ctlogo span{width:80px;height:80px;border-radius:12px;background:var(--bg);object-fit:contain;display:grid;place-items:center;font-size:32px}
+.ctlogo label{cursor:pointer;color:var(--brand);font-weight:700}
+.ctlogo .rm{position:absolute;right:2px;top:-6px;width:22px;height:22px;border-radius:50%;border:0;background:#e5484d;color:#fff;cursor:pointer;font-size:12px}
+.ctfields{display:grid;gap:6px}
+.ctfields input,.ctfields textarea{font:inherit;font-size:13px;padding:8px 10px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink);width:100%}
+.ctfields textarea{min-height:80px;resize:vertical}
+.ctfields .bar2{margin:0;gap:6px}
+.ctfields .btn{padding:5px 10px;font-size:12px}
+@media (max-width:560px){.ctitem{grid-template-columns:1fr}}

@@ -26,7 +26,7 @@ async function remote() {
   return { head, posts: w.PUBLISHED_POSTS || seed(), banners: w.PUBLISHED_BANNERS || {}, cases: w.PUBLISHED_CASES || seedCases() };
 }
 const imgsOf = d => [...d.posts.flatMap(p => p.imgs || []), ...Object.values(d.banners).map(b => b.img).filter(Boolean),
-  ...d.cases.flatMap(c => c.posters.map(p => p.img))];
+  ...d.cases.flatMap(c => [...c.posters.map(p => p.img), ...(c.tools || []).map(t => t.img).filter(Boolean)])];
 const newPath = () => `photos/${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}.jpg`;
 
 // op(d): 최신 게시본 d 에 이번 변경을 적용하는 함수. 그사이 다른 사람이 저장했으면 최신본에 다시 적용합니다.
@@ -50,7 +50,7 @@ async function commit(op, msg) {
     };
     for (const p of d.posts) { const a = []; for (const s of p.imgs || []) a.push(await up(s)); p.imgs = a; }
     for (const b of Object.values(d.banners)) b.img = await up(b.img);
-    for (const c of d.cases) for (const p of c.posters) p.img = await up(p.img);
+    for (const c of d.cases) { for (const p of c.posters) p.img = await up(p.img); for (const t of c.tools || []) t.img = await up(t.img); }
     const after = new Set(imgsOf(d));
     before.forEach(path => { if (path.startsWith("photos/") && !after.has(path)) tree.push({ path, mode: "100644", type: "blob", sha: null }); });
     tree.push({ path: "posts.js", mode: "100644", type: "blob", content: postsJs(d.posts, d.banners, d.cases) });
@@ -273,11 +273,12 @@ function render() {
 /* ---------- 교사 수업 사례 공유 (과목 탭 · 포스터) ---------- */
 // 과목 추가·이름·순서·삭제는 바로 저장되고, 포스터는 고친 뒤 '이 과목 저장'을 눌러 한 번에 저장합니다.
 let ccId = null;
-const ccDirty = () => cc && JSON.stringify(cc) !== JSON.stringify(cases.find(x => x.id === cc.id) || null);
+const ccSig = x => x ? JSON.stringify([x.name, x.posters, x.tools || []]) : "";
+const ccDirty = () => cc && ccSig(cc) !== ccSig(cases.find(x => x.id === cc.id));
 function renderCases() {
   const box = $("#casesBox");
   if (!cases.some(x => x.id === ccId)) ccId = cases.length ? cases[0].id : null;
-  if (!cc || cc.id !== ccId) cc = ccId ? clone(cases.find(x => x.id === ccId)) : null;
+  if (!cc || cc.id !== ccId) { cc = ccId ? clone(cases.find(x => x.id === ccId)) : null; if (cc && !cc.tools) cc.tools = []; }
   const c = cc, ci = cases.findIndex(x => x.id === ccId);
   box.innerHTML = `<h2>교사 수업 사례 공유</h2>
   <p class="note" style="margin-bottom:12px">교사 페이지 아래 '수업 사례 공유'에 과목 탭으로 표시됩니다. 과목을 고른 뒤 포스터를 올리고 <b>이 과목 저장</b>을 누르세요. 포스터 글자가 잘 보이도록 큰 사진(가로 1200px 이상)을 권장합니다.</p>
@@ -289,6 +290,14 @@ function renderCases() {
   <div class="cposters">${c.posters.map((p, i) => `<div class="cpitem"><img src="${src(p.img)}" alt="">
     <input data-ct="${i}" value="${esc(p.title)}" placeholder="수업 주제 (예: AI로 만드는 시)"><input data-ctc="${i}" value="${esc(p.teacher)}" placeholder="교사명 (선택)">
     <div class="bar2"><button class="btn ghost" data-cm="${i}" data-dir="-1" ${i ? "" : "disabled"}>◀</button><button class="btn ghost" data-cm="${i}" data-dir="1" ${i < c.posters.length - 1 ? "" : "disabled"}>▶</button><button class="btn danger" data-cx="${i}">삭제</button></div></div>`).join("") || '<p class="note">아직 올린 포스터가 없습니다.</p>'}</div>
+  <h3 style="margin:22px 0 6px">🤖 ${esc(c.name)} 수업에 활용한 AI 코스웨어</h3>
+  <p class="note" style="margin-bottom:10px">교사 페이지에서 포스터 오른쪽에 소개됩니다. 로고는 넣지 않아도 됩니다.</p>
+  <div class="ctlist">${c.tools.map((t, i) => `<div class="ctitem">
+    <div class="ctlogo">${t.img ? `<img src="${src(t.img)}" alt=""><button class="rm" data-tlx="${i}" title="로고 빼기">✕</button>` : "<span>🤖</span>"}<label class="note">로고 ${t.img ? "변경" : "올리기"}<input type="file" accept="image/*" data-tl="${i}" hidden></label></div>
+    <div class="ctfields"><input data-tn="${i}" value="${esc(t.name)}" placeholder="코스웨어 이름 (예: 클래스팅 AI)"><input data-tu="${i}" value="${esc(t.url)}" placeholder="사이트 주소 (선택, 예: https://www.classting.com)">
+    <textarea data-td="${i}" placeholder="소개 (어떤 코스웨어인지, 수업에서 어떻게 활용했는지)">${esc(t.desc)}</textarea>
+    <div class="bar2"><button class="btn ghost" data-tm="${i}" data-dir="-1" ${i ? "" : "disabled"}>▲</button><button class="btn ghost" data-tm="${i}" data-dir="1" ${i < c.tools.length - 1 ? "" : "disabled"}>▼</button><button class="btn danger" data-tx="${i}">삭제</button></div></div></div>`).join("") || '<p class="note">아직 등록한 코스웨어가 없습니다.</p>'}</div>
+  <button class="btn ghost" id="tadd" style="margin-top:10px">＋ 코스웨어 추가</button>
   <div class="bar2" style="margin-top:16px"><button class="btn primary" id="csave">이 과목 저장</button><button class="btn ghost" id="creset">되돌리기</button>${ccDirty() ? '<span class="note" style="align-self:center;color:#e5484d">저장하지 않은 변경 내용이 있습니다</span>' : ""}</div>`
   : '<p class="note">과목이 없습니다. 과목을 추가해 주세요.</p>'}`;
 
@@ -303,6 +312,12 @@ function renderCases() {
     if (m) { const i = +m.dataset.cm, j = i + +m.dataset.dir; [c.posters[i], c.posters[j]] = [c.posters[j], c.posters[i]]; return renderCases(); }
     const x = e.target.closest("[data-cx]");
     if (x && confirm("이 포스터를 뺄까요? ('이 과목 저장'을 눌러야 사이트에 반영됩니다)")) { c.posters.splice(+x.dataset.cx, 1); return renderCases(); }
+    const tm = e.target.closest("[data-tm]");
+    if (tm) { const i = +tm.dataset.tm, j = i + +tm.dataset.dir; [c.tools[i], c.tools[j]] = [c.tools[j], c.tools[i]]; return renderCases(); }
+    const tx = e.target.closest("[data-tx]");
+    if (tx && confirm("이 코스웨어 소개를 뺄까요? ('이 과목 저장'을 눌러야 사이트에 반영됩니다)")) { c.tools.splice(+tx.dataset.tx, 1); return renderCases(); }
+    const tlx = e.target.closest("[data-tlx]");
+    if (tlx) { delete c.tools[+tlx.dataset.tlx].img; return renderCases(); }
     const mv = e.target.closest("[data-cmv]");
     if (mv && clean()) {
       const dir = +mv.dataset.cmv;
@@ -314,6 +329,13 @@ function renderCases() {
     const t = e.target;
     if (t.dataset.ct != null) c.posters[+t.dataset.ct].title = t.value;
     if (t.dataset.ctc != null) c.posters[+t.dataset.ctc].teacher = t.value;
+    if (t.dataset.tn != null) c.tools[+t.dataset.tn].name = t.value;
+    if (t.dataset.tu != null) c.tools[+t.dataset.tu].url = t.value.trim();
+    if (t.dataset.td != null) c.tools[+t.dataset.td].desc = t.value;
+  };
+  box.onchange = async e => {
+    const t = e.target; if (t.dataset.tl == null || !t.files[0]) return;
+    busy("로고 줄이는 중…"); c.tools[+t.dataset.tl].img = await shrink(t.files[0], 600, .9); busy(); renderCases();
   };
 
   $("#cadd").onclick = () => {
@@ -333,15 +355,19 @@ function renderCases() {
     if (!confirm(`'${c.name}' 과목${n ? `과 포스터 ${n}장` : ""}을 삭제할까요?`)) return;
     save(d => { d.cases = d.cases.filter(y => y.id !== c.id); }, "수업 사례 과목 삭제: " + c.name, () => { cc = null; });
   };
+  $("#tadd").onclick = () => { c.tools.push({ name: "", desc: "", url: "" }); renderCases(); };
   $("#cfiles").onchange = async e => {
     const fs = [...e.target.files]; e.target.value = "";
     for (let i = 0; i < fs.length; i++) { busy(`포스터 줄이는 중… (${i + 1} / ${fs.length})`); c.posters.push({ img: await shrink(fs[i], 2400, .85), title: "", teacher: "" }); }
     busy(); renderCases();
   };
-  $("#csave").onclick = () => save(d => {
-    const y = d.cases.find(y => y.id === c.id);
-    if (y) y.posters = clone(c.posters); else d.cases.push(clone(c));
-  }, "수업 사례 저장: " + c.name, () => { cc = null; });
+  $("#csave").onclick = () => {
+    if (c.tools.some(t => !t.name.trim())) return alert("코스웨어 이름을 입력해 주세요. (필요 없는 칸은 '삭제'를 눌러 주세요)");
+    save(d => {
+      const y = d.cases.find(y => y.id === c.id);
+      if (y) { y.posters = clone(c.posters); y.tools = clone(c.tools); } else d.cases.push(clone(c));
+    }, "수업 사례 저장: " + c.name, () => { cc = null; });
+  };
   $("#creset").onclick = () => { cc = null; renderCases(); };
 }
 

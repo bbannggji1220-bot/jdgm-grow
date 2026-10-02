@@ -153,10 +153,16 @@ function cases() {
   const draw = () => {
     const c = list.find(x => x.id === cur);
     $("#ctabs").innerHTML = list.map(x => `<button class="ctab${x.id === cur ? " on" : ""}" role="tab" aria-selected="${x.id === cur}" data-c="${x.id}">${esc(x.name)}${x.posters.length ? ` <small>${x.posters.length}</small>` : ""}</button>`).join("");
+    $("#cgrid").className = "cgrid" + (c.posters.length === 1 ? " one" : "");
     $("#cgrid").innerHTML = c.posters.length
       ? c.posters.map((p, i) => `<button class="cpost" data-p="${i}"><span class="cimg"><img src="${p.img}" alt="${esc(p.title || c.name + " 수업 사례 포스터")}" loading="lazy"></span>
         ${p.title || p.teacher ? `<span class="ccap">${p.title ? `<b>${esc(p.title)}</b>` : ""}${p.teacher ? `<small>${esc(p.teacher)}</small>` : ""}</span>` : ""}</button>`).join("")
       : `<div class="cempty"><span>🗂️</span>${esc(c.name)} 수업 사례 포스터가 곧 올라올 예정입니다.</div>`;
+    const tools = c.tools || [];
+    $("#ctools").innerHTML = tools.length
+      ? tools.map(t => `<div class="ctool"><div class="ctop">${t.img ? `<img src="${t.img}" alt="">` : `<span class="clogo">🤖</span>`}<b>${esc(t.name)}</b></div>
+        ${t.desc ? `<p class="pre">${esc(t.desc)}</p>` : ""}${t.url ? `<a class="btn ghost" href="${esc(webUrl(t.url))}" target="_blank" rel="noopener">사이트 바로가기 ↗</a>` : ""}</div>`).join("")
+      : `<div class="cempty"><span>🤖</span>${esc(c.name)} 수업에 활용한 AI 코스웨어 소개가 곧 올라올 예정입니다.</div>`;
   };
   draw();
   $("#ctabs").addEventListener("click", e => { const b = e.target.closest("[data-c]"); if (b) { cur = b.dataset.c; draw(); } });
