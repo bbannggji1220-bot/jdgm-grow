@@ -373,7 +373,13 @@ window.PUBLISHED_CASES = [
  {
   "id": "c3",
   "name": "사회",
-  "posters": []
+  "posters": [
+   {
+    "img": "photos/muq9q5o0-vza0no.jpg",
+    "title": "AI 및 디지털 도구로 그리고 소통하는 세계시민 프로젝트",
+    "teacher": "강은희"
+   }
+  ]
  },
  {
   "id": "c4",
