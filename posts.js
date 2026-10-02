@@ -416,7 +416,13 @@ window.PUBLISHED_CASES = [
  {
   "id": "c10",
   "name": "음악",
-  "posters": []
+  "posters": [
+   {
+    "img": "photos/muq9ultk-tfynim.jpg",
+    "title": "AI와 디지털 도구로 펼치는 음악적 상상력",
+    "teacher": "고예진"
+   }
+  ]
  },
  {
   "id": "c11",
