@@ -389,7 +389,18 @@ window.PUBLISHED_CASES = [
  {
   "id": "c6",
   "name": "과학",
-  "posters": []
+  "posters": [
+   {
+    "img": "photos/muq9s961-no8g1x.jpg",
+    "title": "바이브 코딩 기반 과학게임 웹앱을 활용한 학생 참여형 과학 수업",
+    "teacher": "임지윤"
+   },
+   {
+    "img": "photos/muq9sa2o-tqf7uq.jpg",
+    "title": "AI로 디자인하고 디지털로 누적하는 학생 주도형 과학 수업",
+    "teacher": "임지윤"
+   }
+  ]
  },
  {
   "id": "c8",
