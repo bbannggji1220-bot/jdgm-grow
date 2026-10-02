@@ -450,6 +450,12 @@ window.PUBLISHED_CASES = [
  {
   "id": "cmuq9xulv",
   "name": "진로",
-  "posters": []
+  "posters": [
+   {
+    "img": "photos/muq9yvqp-fi6s2i.jpg",
+    "title": "진로에몽과 함께 나에게 맞는 진로 찾기",
+    "teacher": "강소현"
+   }
+  ]
  }
 ];
