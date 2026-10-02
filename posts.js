@@ -476,7 +476,7 @@ window.PUBLISHED_TOOLS = [
  {
   "id": "t0",
   "name": "클래스팅 AI",
-  "desc": "",
+  "desc": "클래스팅 AI 중 샌드박스는 교사가 프롬프트를 제어하고 대화 내용을 실시간 모니터링할 수 있는 안전한 생성형 AI 실습 환경이며, 학생들과 생성형 AI 과제 및 바이브 코딩 앱 제작하기 활동이 가능한 코스웨어",
   "url": "https://www.classting.com/",
   "posters": [],
   "img": "photos/muqhp3rm-9mu4jv.jpg"
