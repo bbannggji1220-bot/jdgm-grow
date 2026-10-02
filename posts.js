@@ -374,7 +374,13 @@ window.PUBLISHED_CASES = [
  {
   "id": "c2",
   "name": "수학",
-  "posters": []
+  "posters": [
+   {
+    "img": "photos/muqcg60t-j8m9j0.jpg",
+    "title": "AI로 생성하고 디지털 도구로 분석하는 수학 탐구 수업",
+    "teacher": "양세연"
+   }
+  ]
  },
  {
   "id": "c3",
@@ -457,5 +463,21 @@ window.PUBLISHED_CASES = [
     "teacher": "강소현"
    }
   ]
+ }
+];
+window.PUBLISHED_TOOLS = [
+ {
+  "id": "t0",
+  "name": "클래스팅 AI",
+  "desc": "",
+  "url": "",
+  "posters": []
+ },
+ {
+  "id": "t1",
+  "name": "왓퀴즈",
+  "desc": "",
+  "url": "",
+  "posters": []
  }
 ];
