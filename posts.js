@@ -500,7 +500,7 @@ window.PUBLISHED_TOOLS = [
   "id": "tmuqhz4wr",
   "name": "리딩앤",
   "desc": "",
-  "url": "",
+  "url": "https://www.readingn.com/",
   "posters": []
  }
 ];
