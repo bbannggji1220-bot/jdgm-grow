@@ -388,11 +388,6 @@ window.PUBLISHED_CASES = [
   ]
  },
  {
-  "id": "c4",
-  "name": "역사",
-  "posters": []
- },
- {
   "id": "c6",
   "name": "과학",
   "posters": [
