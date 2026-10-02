@@ -128,7 +128,10 @@ window.PUBLISHED_POSTS = [
    "코스웨어 체리",
    "자기주도학습"
   ],
-  "imgs": []
+  "imgs": [
+   "photos/muqhgv3f-ki1195.jpg"
+  ],
+  "cpos": 0
  },
  {
   "id": "teacher-0",
