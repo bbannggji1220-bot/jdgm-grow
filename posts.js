@@ -435,5 +435,10 @@ window.PUBLISHED_CASES = [
     "teacher": "문유지"
    }
   ]
+ },
+ {
+  "id": "cmuq9wrnv",
+  "name": "동아리",
+  "posters": []
  }
 ];
