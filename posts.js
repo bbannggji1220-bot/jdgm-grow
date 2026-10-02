@@ -59,10 +59,12 @@ window.PUBLISHED_POSTS = [
    "숏폼·포스터·4컷 만화"
   ],
   "imgs": [
+   "photos/muqhidun-el0te5.jpg",
    "photos/student-2-1.jpg",
    "photos/mup6qt0c-2v49ru.jpg",
    "photos/mup6qubz-9364mk.jpg"
-  ]
+  ],
+  "cpos": 0
  },
  {
   "id": "student-3",
