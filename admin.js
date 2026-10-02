@@ -1,8 +1,8 @@
 const $ = (s, r = document) => r.querySelector(s);
 const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const app = $("#app");
-let posts = [], banners = {}, cases = [], cur = null; // cur = 편집 중인 게시물
-let cc = null; // cc = 편집 중인 수업 사례 과목 (저장 전 작업본)
+let posts = [], banners = {}, cur = null; // cur = 편집 중인 게시물
+const gal = { cases: [], tools: [] }; // 교사 페이지 탭 갤러리 (수업 사례 · AI 코스웨어)
 
 /* ---------- GitHub 저장 ---------- */
 // 사진은 photos/ 폴더에 파일로, 글·배너 설정은 posts.js 에 한 번의 커밋으로 저장합니다.
@@ -23,10 +23,10 @@ async function api(path, opt = {}) {
 async function remote() {
   const head = (await api(`/git/ref/heads/${GH_BRANCH}`)).object.sha;
   const w = {}; new Function("window", await api(`/contents/posts.js?ref=${head}`, { raw: true }))(w);
-  return { head, posts: w.PUBLISHED_POSTS || seed(), banners: w.PUBLISHED_BANNERS || {}, cases: w.PUBLISHED_CASES || seedCases() };
+  return { head, posts: w.PUBLISHED_POSTS || seed(), banners: w.PUBLISHED_BANNERS || {}, cases: w.PUBLISHED_CASES || seedCases(), tools: w.PUBLISHED_TOOLS || seedTools() };
 }
 const imgsOf = d => [...d.posts.flatMap(p => p.imgs || []), ...Object.values(d.banners).map(b => b.img).filter(Boolean),
-  ...d.cases.flatMap(c => [...c.posters.map(p => p.img), ...(c.tools || []).map(t => t.img).filter(Boolean)])];
+  ...[...d.cases, ...d.tools].flatMap(c => [...c.posters.map(p => p.img), c.img]).filter(Boolean)];
 const newPath = () => `photos/${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}.jpg`;
 
 // op(d): 최신 게시본 d 에 이번 변경을 적용하는 함수. 그사이 다른 사람이 저장했으면 최신본에 다시 적용합니다.
@@ -34,7 +34,7 @@ async function commit(op, msg) {
   for (let t = 0; ; t++) {
     busy("GitHub에서 최신 내용을 확인하는 중…");
     const r = await remote();
-    const d = { posts: r.posts, banners: r.banners, cases: r.cases };
+    const d = { posts: r.posts, banners: r.banners, cases: r.cases, tools: r.tools };
     const before = new Set(imgsOf(d));
     op(d);
     const tree = [], total = imgsOf(d).filter(s => s.startsWith("data:")).length;
@@ -50,17 +50,17 @@ async function commit(op, msg) {
     };
     for (const p of d.posts) { const a = []; for (const s of p.imgs || []) a.push(await up(s)); p.imgs = a; }
     for (const b of Object.values(d.banners)) b.img = await up(b.img);
-    for (const c of d.cases) { for (const p of c.posters) p.img = await up(p.img); for (const t of c.tools || []) t.img = await up(t.img); }
+    for (const c of [...d.cases, ...d.tools]) { for (const p of c.posters) p.img = await up(p.img); if (c.img) c.img = await up(c.img); }
     const after = new Set(imgsOf(d));
     before.forEach(path => { if (path.startsWith("photos/") && !after.has(path)) tree.push({ path, mode: "100644", type: "blob", sha: null }); });
-    tree.push({ path: "posts.js", mode: "100644", type: "blob", content: postsJs(d.posts, d.banners, d.cases) });
+    tree.push({ path: "posts.js", mode: "100644", type: "blob", content: postsJs(d.posts, d.banners, d.cases, d.tools) });
     busy("GitHub에 저장하는 중…");
     const base = (await api(`/git/commits/${r.head}`)).tree.sha;
     const nt = await api("/git/trees", { method: "POST", body: { base_tree: base, tree } });
     const c = await api("/git/commits", { method: "POST", body: { message: msg, tree: nt.sha, parents: [r.head] } });
     try {
       await api(`/git/refs/heads/${GH_BRANCH}`, { method: "PATCH", body: { sha: c.sha } });
-      posts = d.posts; banners = d.banners; cases = d.cases;
+      posts = d.posts; banners = d.banners; gal.cases = d.cases; gal.tools = d.tools;
       return;
     } catch (e) { if (e.status !== 422 || t >= 2) throw e; }
   }
@@ -94,10 +94,10 @@ function login() {
 }
 
 async function load() {
-  if (!token()) { posts = getPosts(); banners = getBanners(); cases = getCases(); return render(); }
+  if (!token()) { posts = getPosts(); banners = getBanners(); gal.cases = getCases(); gal.tools = getTools(); return render(); }
   busy("GitHub에서 내용을 불러오는 중…");
-  try { const r = await remote(); posts = r.posts; banners = r.banners; cases = r.cases; busy(); render(); }
-  catch (e) { busy(); posts = getPosts(); banners = getBanners(); cases = getCases(); render(); alert(errMsg(e)); }
+  try { const r = await remote(); posts = r.posts; banners = r.banners; gal.cases = r.cases; gal.tools = r.tools; busy(); render(); }
+  catch (e) { busy(); posts = getPosts(); banners = getBanners(); gal.cases = getCases(); gal.tools = getTools(); render(); alert(errMsg(e)); }
 }
 
 const blank = () => ({ id: "n" + Date.now(), role: "student", s: 3, e: 3, title: "", desc: "", pts: [], kw: [], imgs: [] });
@@ -165,8 +165,9 @@ function render() {
         <button class="btn danger" data-bd="${k}">배너 삭제</button>` : ""}
       </div></div>`; }).join("")}</div>
   </div>
-  <div class="box" id="casesBox"></div>`;
-  renderCases();
+  <div class="box" id="casesBox"></div>
+  <div class="box" id="toolsBox"></div>`;
+  renderGal("cases"); renderGal("tools");
 
   // GitHub 연결
   if ($("#conn")) $("#conn").onclick = async () => {
@@ -270,105 +271,88 @@ function render() {
   });
 }
 
-/* ---------- 교사 수업 사례 공유 (과목 탭 · 포스터) ---------- */
-// 과목 추가·이름·순서·삭제는 바로 저장되고, 포스터는 고친 뒤 '이 과목 저장'을 눌러 한 번에 저장합니다.
-let ccId = null;
-const ccSig = x => x ? JSON.stringify([x.name, x.posters, x.tools || []]) : "";
-const ccDirty = () => cc && ccSig(cc) !== ccSig(cases.find(x => x.id === cc.id));
-function renderCases() {
-  const box = $("#casesBox");
-  if (!cases.some(x => x.id === ccId)) ccId = cases.length ? cases[0].id : null;
-  if (!cc || cc.id !== ccId) { cc = ccId ? clone(cases.find(x => x.id === ccId)) : null; if (cc && !cc.tools) cc.tools = []; }
-  const c = cc, ci = cases.findIndex(x => x.id === ccId);
-  box.innerHTML = `<h2>교사 수업 사례 공유</h2>
-  <p class="note" style="margin-bottom:12px">교사 페이지 아래 '수업 사례 공유'에 과목 탭으로 표시됩니다. 과목을 고른 뒤 포스터를 올리고 <b>이 과목 저장</b>을 누르세요. 포스터 글자가 잘 보이도록 큰 사진(가로 1200px 이상)을 권장합니다.</p>
-  <div class="ctabs">${cases.map(x => `<button class="ctab${x.id === ccId ? " on" : ""}" data-cs="${x.id}">${esc(x.name)} <small>${x.posters.length}</small></button>`).join("")}</div>
-  <div class="bar2" style="margin:12px 0 18px"><button class="btn ghost" id="cadd">＋ 과목 추가</button>${c ? `<button class="btn ghost" id="cren">이름 바꾸기</button>
-    <button class="btn ghost" data-cmv="-1" ${ci > 0 ? "" : "disabled"}>◀ 앞으로</button><button class="btn ghost" data-cmv="1" ${ci < cases.length - 1 ? "" : "disabled"}>뒤로 ▶</button>
-    <button class="btn danger" id="cdel">과목 삭제</button>` : ""}</div>
-  ${c ? `<div class="f"><label>${esc(c.name)} 포스터 올리기 (여러 장 가능 · 첫 번째 포스터가 맨 앞에 보입니다)</label><input type="file" id="cfiles" accept="image/*" multiple></div>
+/* ---------- 교사 페이지 탭 갤러리: 수업 사례 공유(과목) · AI 코스웨어 활용 ---------- */
+// 탭 추가·이름·순서·삭제는 바로 저장되고, 탭 안의 내용(소개·포스터)은 고친 뒤 '저장'을 눌러 한 번에 저장합니다.
+const GAL = {
+  cases: { box: "casesBox", title: "📋 수업 사례 공유", label: "수업 사례", unit: "과목", eg: "진로", ph: "수업 주제 (예: AI로 만드는 시)",
+    what: "교사 페이지 왼쪽 '수업 사례 공유'에 과목 탭으로 표시됩니다." },
+  tools: { box: "toolsBox", title: "🤖 AI 코스웨어 활용", label: "AI 코스웨어", unit: "코스웨어", eg: "패들렛", ph: "활용 사례 제목 (예: 영어 개별 맞춤 학습)", info: true,
+    what: "교사 페이지 오른쪽 'AI 코스웨어 활용'에 코스웨어 탭으로 표시됩니다. 탭마다 코스웨어 소개와 활용 사례 사진·포스터를 넣을 수 있습니다." }
+};
+const ged = { cases: { id: null, cur: null }, tools: { id: null, cur: null } }; // 탭별 선택 상태와 저장 전 작업본
+const galSig = x => x ? JSON.stringify([x.posters, x.desc || "", x.url || "", x.img || ""]) : "";
+const galDirty = k => { const c = ged[k].cur; return !!c && galSig(c) !== galSig(gal[k].find(x => x.id === c.id)); };
+function renderGal(k) {
+  const G = GAL[k], list = gal[k], st = ged[k], box = $("#" + G.box);
+  if (!list.some(x => x.id === st.id)) st.id = list.length ? list[0].id : null;
+  if (!st.cur || st.cur.id !== st.id) st.cur = st.id ? clone(list.find(x => x.id === st.id)) : null;
+  const c = st.cur, ci = list.findIndex(x => x.id === st.id), re = () => renderGal(k);
+  box.innerHTML = `<h2>${G.title}</h2>
+  <p class="note" style="margin-bottom:12px">${G.what} 탭을 고른 뒤 내용을 고치고 <b>저장</b>을 누르세요. 포스터 글자가 잘 보이도록 큰 사진(가로 1200px 이상)을 권장합니다.</p>
+  <div class="ctabs">${list.map(x => `<button class="ctab${x.id === st.id ? " on" : ""}" data-g="tab" data-id="${x.id}">${esc(x.name)} <small>${x.posters.length}</small></button>`).join("")}</div>
+  <div class="bar2" style="margin:12px 0 18px"><button class="btn ghost" data-g="add">＋ ${G.unit} 추가</button>${c ? `<button class="btn ghost" data-g="ren">이름 바꾸기</button>
+    <button class="btn ghost" data-g="mv" data-dir="-1" ${ci > 0 ? "" : "disabled"}>◀ 앞으로</button><button class="btn ghost" data-g="mv" data-dir="1" ${ci < list.length - 1 ? "" : "disabled"}>뒤로 ▶</button>
+    <button class="btn danger" data-g="del">${G.unit} 삭제</button>` : ""}</div>
+  ${c ? `${G.info ? `<div class="ctitem" style="margin-bottom:16px">
+    <div class="ctlogo">${c.img ? `<img src="${src(c.img)}" alt=""><button class="rm" data-g="logox" title="로고 빼기">✕</button>` : "<span>🤖</span>"}<label class="note">로고 ${c.img ? "변경" : "올리기"}<input type="file" accept="image/*" data-g="logo" hidden></label></div>
+    <div class="ctfields"><input data-f="url" value="${esc(c.url)}" placeholder="사이트 주소 (선택, 예: https://www.classting.com)">
+    <textarea data-f="desc" placeholder="${esc(c.name)} 소개 (어떤 코스웨어인지, 수업에서 어떻게 활용했는지)">${esc(c.desc)}</textarea></div></div>` : ""}
+  <div class="f"><label>${esc(c.name)} ${G.info ? "활용 사례 사진·포스터" : "포스터"} 올리기 (여러 장 가능 · 첫 번째가 맨 앞에 보입니다)</label><input type="file" data-g="files" accept="image/*" multiple></div>
   <div class="cposters">${c.posters.map((p, i) => `<div class="cpitem"><img src="${src(p.img)}" alt="">
-    <input data-ct="${i}" value="${esc(p.title)}" placeholder="수업 주제 (예: AI로 만드는 시)"><input data-ctc="${i}" value="${esc(p.teacher)}" placeholder="교사명 (선택)">
-    <div class="bar2"><button class="btn ghost" data-cm="${i}" data-dir="-1" ${i ? "" : "disabled"}>◀</button><button class="btn ghost" data-cm="${i}" data-dir="1" ${i < c.posters.length - 1 ? "" : "disabled"}>▶</button><button class="btn danger" data-cx="${i}">삭제</button></div></div>`).join("") || '<p class="note">아직 올린 포스터가 없습니다.</p>'}</div>
-  <h3 style="margin:22px 0 6px">🤖 ${esc(c.name)} 수업에 활용한 AI 코스웨어</h3>
-  <p class="note" style="margin-bottom:10px">교사 페이지에서 포스터 오른쪽에 소개됩니다. 로고는 넣지 않아도 됩니다.</p>
-  <div class="ctlist">${c.tools.map((t, i) => `<div class="ctitem">
-    <div class="ctlogo">${t.img ? `<img src="${src(t.img)}" alt=""><button class="rm" data-tlx="${i}" title="로고 빼기">✕</button>` : "<span>🤖</span>"}<label class="note">로고 ${t.img ? "변경" : "올리기"}<input type="file" accept="image/*" data-tl="${i}" hidden></label></div>
-    <div class="ctfields"><input data-tn="${i}" value="${esc(t.name)}" placeholder="코스웨어 이름 (예: 클래스팅 AI)"><input data-tu="${i}" value="${esc(t.url)}" placeholder="사이트 주소 (선택, 예: https://www.classting.com)">
-    <textarea data-td="${i}" placeholder="소개 (어떤 코스웨어인지, 수업에서 어떻게 활용했는지)">${esc(t.desc)}</textarea>
-    <div class="bar2"><button class="btn ghost" data-tm="${i}" data-dir="-1" ${i ? "" : "disabled"}>▲</button><button class="btn ghost" data-tm="${i}" data-dir="1" ${i < c.tools.length - 1 ? "" : "disabled"}>▼</button><button class="btn danger" data-tx="${i}">삭제</button></div></div></div>`).join("") || '<p class="note">아직 등록한 코스웨어가 없습니다.</p>'}</div>
-  <button class="btn ghost" id="tadd" style="margin-top:10px">＋ 코스웨어 추가</button>
-  <div class="bar2" style="margin-top:16px"><button class="btn primary" id="csave">이 과목 저장</button><button class="btn ghost" id="creset">되돌리기</button>${ccDirty() ? '<span class="note" style="align-self:center;color:#e5484d">저장하지 않은 변경 내용이 있습니다</span>' : ""}</div>`
-  : '<p class="note">과목이 없습니다. 과목을 추가해 주세요.</p>'}`;
+    <input data-pt="${i}" value="${esc(p.title)}" placeholder="${G.ph}"><input data-pc="${i}" value="${esc(p.teacher)}" placeholder="교사명 (선택)">
+    <div class="bar2"><button class="btn ghost" data-g="pm" data-i="${i}" data-dir="-1" ${i ? "" : "disabled"}>◀</button><button class="btn ghost" data-g="pm" data-i="${i}" data-dir="1" ${i < c.posters.length - 1 ? "" : "disabled"}>▶</button><button class="btn danger" data-g="px" data-i="${i}">삭제</button></div></div>`).join("") || '<p class="note">아직 올린 사진이 없습니다.</p>'}</div>
+  <div class="bar2" style="margin-top:16px"><button class="btn primary" data-g="save">${esc(c.name)} 저장</button><button class="btn ghost" data-g="reset">되돌리기</button>${galDirty(k) ? '<span class="note" style="align-self:center;color:#e5484d">저장하지 않은 변경 내용이 있습니다</span>' : ""}</div>`
+  : `<p class="note">탭이 없습니다. '＋ ${G.unit} 추가'를 눌러 주세요.</p>`}`;
 
-  const clean = () => !ccDirty() || (alert("먼저 포스터 변경 내용을 '이 과목 저장'으로 저장하거나 '되돌리기'를 눌러 주세요."), false);
+  const clean = () => !galDirty(k) || (alert(`먼저 '${c.name} 저장'을 누르거나 '되돌리기'를 눌러 주세요.`), false);
   box.onclick = e => {
-    const t = e.target.closest("[data-cs]");
-    if (t && t.dataset.cs !== ccId) {
-      if (ccDirty() && !confirm("저장하지 않은 포스터 변경 내용이 있습니다. 버리고 다른 과목으로 갈까요?")) return;
-      ccId = t.dataset.cs; cc = null; return renderCases();
+    const b = e.target.closest("[data-g]"); if (!b) return;
+    const g = b.dataset.g, i = +b.dataset.i, dir = +b.dataset.dir;
+    if (g === "tab" && b.dataset.id !== st.id) {
+      if (galDirty(k) && !confirm("저장하지 않은 변경 내용이 있습니다. 버리고 다른 탭으로 갈까요?")) return;
+      st.id = b.dataset.id; st.cur = null; re();
     }
-    const m = e.target.closest("[data-cm]");
-    if (m) { const i = +m.dataset.cm, j = i + +m.dataset.dir; [c.posters[i], c.posters[j]] = [c.posters[j], c.posters[i]]; return renderCases(); }
-    const x = e.target.closest("[data-cx]");
-    if (x && confirm("이 포스터를 뺄까요? ('이 과목 저장'을 눌러야 사이트에 반영됩니다)")) { c.posters.splice(+x.dataset.cx, 1); return renderCases(); }
-    const tm = e.target.closest("[data-tm]");
-    if (tm) { const i = +tm.dataset.tm, j = i + +tm.dataset.dir; [c.tools[i], c.tools[j]] = [c.tools[j], c.tools[i]]; return renderCases(); }
-    const tx = e.target.closest("[data-tx]");
-    if (tx && confirm("이 코스웨어 소개를 뺄까요? ('이 과목 저장'을 눌러야 사이트에 반영됩니다)")) { c.tools.splice(+tx.dataset.tx, 1); return renderCases(); }
-    const tlx = e.target.closest("[data-tlx]");
-    if (tlx) { delete c.tools[+tlx.dataset.tlx].img; return renderCases(); }
-    const mv = e.target.closest("[data-cmv]");
-    if (mv && clean()) {
-      const dir = +mv.dataset.cmv;
-      save(d => { const i = d.cases.findIndex(y => y.id === c.id), j = i + dir; if (i >= 0 && j >= 0 && j < d.cases.length) [d.cases[i], d.cases[j]] = [d.cases[j], d.cases[i]]; },
-        "수업 사례 과목 순서 변경: " + c.name);
+    if (g === "add" && clean()) {
+      const name = (prompt(`추가할 ${G.unit} 이름 (예: ${G.eg})`) || "").trim(); if (!name) return;
+      const id = k[0] + Date.now().toString(36);
+      save(d => { d[k].push(G.info ? { id, name, desc: "", url: "", posters: [] } : { id, name, posters: [] }); }, `${G.label} 탭 추가: ${name}`, () => { st.id = id; st.cur = null; });
     }
+    if (g === "ren" && clean()) {
+      const name = (prompt(`새 ${G.unit} 이름`, c.name) || "").trim(); if (!name || name === c.name) return;
+      save(d => { const y = d[k].find(y => y.id === c.id); if (y) y.name = name; }, `${G.label} 탭 이름 변경: ${c.name} → ${name}`, () => { st.cur = null; });
+    }
+    if (g === "mv" && clean())
+      save(d => { const a = d[k], x = a.findIndex(y => y.id === c.id), j = x + dir; if (x >= 0 && j >= 0 && j < a.length) [a[x], a[j]] = [a[j], a[x]]; }, `${G.label} 탭 순서 변경: ${c.name}`);
+    if (g === "del") {
+      const n = (list.find(y => y.id === c.id) || c).posters.length;
+      if (confirm(`'${c.name}' 탭${n ? `과 사진 ${n}장` : ""}을 삭제할까요?`))
+        save(d => { d[k] = d[k].filter(y => y.id !== c.id); }, `${G.label} 탭 삭제: ${c.name}`, () => { st.cur = null; });
+    }
+    if (g === "pm") { [c.posters[i], c.posters[i + dir]] = [c.posters[i + dir], c.posters[i]]; re(); }
+    if (g === "px" && confirm("이 사진을 뺄까요? ('저장'을 눌러야 사이트에 반영됩니다)")) { c.posters.splice(i, 1); re(); }
+    if (g === "logox") { delete c.img; re(); }
+    if (g === "save") save(d => {
+      let y = d[k].find(y => y.id === c.id);
+      if (!y) d[k].push(y = { id: c.id, name: c.name });
+      y.posters = clone(c.posters);
+      if (G.info) { y.desc = c.desc || ""; y.url = (c.url || "").trim(); if (c.img) y.img = c.img; else delete y.img; }
+    }, `${G.label} 저장: ${c.name}`, () => { st.cur = null; });
+    if (g === "reset") { st.cur = null; re(); }
   };
   box.oninput = e => {
     const t = e.target;
-    if (t.dataset.ct != null) c.posters[+t.dataset.ct].title = t.value;
-    if (t.dataset.ctc != null) c.posters[+t.dataset.ctc].teacher = t.value;
-    if (t.dataset.tn != null) c.tools[+t.dataset.tn].name = t.value;
-    if (t.dataset.tu != null) c.tools[+t.dataset.tu].url = t.value.trim();
-    if (t.dataset.td != null) c.tools[+t.dataset.td].desc = t.value;
+    if (t.dataset.pt != null) c.posters[+t.dataset.pt].title = t.value;
+    if (t.dataset.pc != null) c.posters[+t.dataset.pc].teacher = t.value;
+    if (t.dataset.f) c[t.dataset.f] = t.value;
   };
   box.onchange = async e => {
-    const t = e.target; if (t.dataset.tl == null || !t.files[0]) return;
-    busy("로고 줄이는 중…"); c.tools[+t.dataset.tl].img = await shrink(t.files[0], 600, .9); busy(); renderCases();
+    const t = e.target, fs = t.files ? [...t.files] : []; if (!fs.length) return;
+    t.value = "";
+    if (t.dataset.g === "logo") { busy("로고 줄이는 중…"); c.img = await shrink(fs[0], 600, .9); }
+    if (t.dataset.g === "files")
+      for (let i = 0; i < fs.length; i++) { busy(`사진 줄이는 중… (${i + 1} / ${fs.length})`); c.posters.push({ img: await shrink(fs[i], 2400, .85), title: "", teacher: "" }); }
+    busy(); re();
   };
-
-  $("#cadd").onclick = () => {
-    if (!clean()) return;
-    const name = (prompt("추가할 과목 이름 (예: 진로)") || "").trim(); if (!name) return;
-    const id = "c" + Date.now().toString(36);
-    save(d => { d.cases.push({ id, name, posters: [] }); }, "수업 사례 과목 추가: " + name, () => { ccId = id; cc = null; });
-  };
-  if (!c) return;
-  $("#cren").onclick = () => {
-    if (!clean()) return;
-    const name = (prompt("새 과목 이름", c.name) || "").trim(); if (!name || name === c.name) return;
-    save(d => { const y = d.cases.find(y => y.id === c.id); if (y) y.name = name; }, `수업 사례 과목 이름 변경: ${c.name} → ${name}`, () => { cc = null; });
-  };
-  $("#cdel").onclick = () => {
-    const n = (cases.find(y => y.id === c.id) || c).posters.length;
-    if (!confirm(`'${c.name}' 과목${n ? `과 포스터 ${n}장` : ""}을 삭제할까요?`)) return;
-    save(d => { d.cases = d.cases.filter(y => y.id !== c.id); }, "수업 사례 과목 삭제: " + c.name, () => { cc = null; });
-  };
-  $("#tadd").onclick = () => { c.tools.push({ name: "", desc: "", url: "" }); renderCases(); };
-  $("#cfiles").onchange = async e => {
-    const fs = [...e.target.files]; e.target.value = "";
-    for (let i = 0; i < fs.length; i++) { busy(`포스터 줄이는 중… (${i + 1} / ${fs.length})`); c.posters.push({ img: await shrink(fs[i], 2400, .85), title: "", teacher: "" }); }
-    busy(); renderCases();
-  };
-  $("#csave").onclick = () => {
-    if (c.tools.some(t => !t.name.trim())) return alert("코스웨어 이름을 입력해 주세요. (필요 없는 칸은 '삭제'를 눌러 주세요)");
-    save(d => {
-      const y = d.cases.find(y => y.id === c.id);
-      if (y) { y.posters = clone(c.posters); y.tools = clone(c.tools); } else d.cases.push(clone(c));
-    }, "수업 사례 저장: " + c.name, () => { cc = null; });
-  };
-  $("#creset").onclick = () => { cc = null; renderCases(); };
 }
 
 function shrink(f, max = 1600, q = .82) {

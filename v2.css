@@ -166,7 +166,7 @@
 @media (max-width:560px){.cpos{grid-template-columns:1fr}}
 
 /* ===== 교사 수업 사례 공유 (과목 탭 · 포스터) ===== */
-.cases{padding-top:24px}
+.cases{padding-top:40px}
 .ctabs{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
 .ctab{font:inherit;font-weight:800;font-size:15px;padding:10px 18px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;transition:.2s}
 .ctab:hover{border-color:var(--accent,var(--brand));color:var(--accent,var(--brand))}
@@ -185,7 +185,7 @@
 .cempty span{font-size:44px}
 @media (max-width:560px){.cgrid{grid-template-columns:repeat(2,1fr);gap:12px}.cimg{padding:6px}.ccap{padding:10px 12px 12px}.ccap b{font-size:13px}.ctab{font-size:14px;padding:8px 14px}}
 /* 관리자: 수업 사례 */
-#casesBox .ctabs{justify-content:flex-start}
+#casesBox .ctabs,#toolsBox .ctabs{justify-content:flex-start}
 .cposters{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px}
 .cpitem{display:grid;gap:6px;border:1px solid var(--line);border-radius:14px;padding:10px}
 .cpitem img{width:100%;aspect-ratio:3/4;object-fit:contain;background:var(--bg);border-radius:8px}
@@ -193,16 +193,18 @@
 .cpitem .bar2{margin:0;gap:6px}
 .cpitem .btn{padding:5px 10px;font-size:12px}
 .btn:disabled{opacity:.4;cursor:default;transform:none}
-/* 수업 사례: 왼쪽 포스터 · 오른쪽 AI 코스웨어 */
-.csplit{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:30px;align-items:start}
-.cpanel{background:var(--surface);border:1px solid var(--line);border-radius:24px;padding:24px;box-shadow:var(--shadow)}
-.cpanel h3{font-size:19px;font-weight:900;margin-bottom:16px}
-.cpanel h3 small{font-size:12px;color:var(--muted);font-weight:600;margin-left:6px}
+/* 교사 페이지: 왼쪽 수업 사례 공유 · 오른쪽 AI 코스웨어 활용 (각자 탭) */
+.csplit{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
+.cpanel{background:var(--surface);border:1px solid var(--line);border-radius:26px;padding:28px;box-shadow:var(--shadow)}
+.cpanel h2{font-size:clamp(22px,2.6vw,28px);font-weight:900;letter-spacing:-.02em}
+.cpanel .csub{color:var(--muted);font-size:14px;margin:4px 0 18px}
+.cpanel .ctabs{justify-content:flex-start;gap:6px;margin-bottom:20px}
+.cpanel .ctab{font-size:14px;padding:8px 14px}
 .csplit .cgrid{margin-top:0;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px}
 .csplit .cgrid.one{grid-template-columns:minmax(0,400px);justify-content:center}
 .csplit .cpost{box-shadow:none}
 .csplit .cempty{padding:40px 16px}
-.ctools{display:grid;gap:14px}
+.ctool+.cgrid{margin-top:16px}
 .ctool{border:1px solid var(--line);border-radius:18px;padding:18px 20px;background:var(--bg)}
 .ctop{display:flex;align-items:center;gap:12px;margin-bottom:10px}
 .ctop img,.clogo{width:52px;height:52px;flex:none;border-radius:14px;border:1px solid var(--line);background:#fff;object-fit:contain}
