@@ -501,7 +501,8 @@ window.PUBLISHED_TOOLS = [
   "name": "리딩앤",
   "desc": "",
   "url": "https://www.readingn.com/",
-  "posters": []
+  "posters": [],
+  "img": "photos/muqi1epz-vkt3tm.jpg"
  }
 ];
 window.PUBLISHED_TUTOR = {
