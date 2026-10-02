@@ -357,7 +357,13 @@ window.PUBLISHED_CASES = [
  {
   "id": "c1",
   "name": "영어",
-  "posters": []
+  "posters": [
+   {
+    "img": "photos/muq9o389-82tguz.jpg",
+    "title": "리딩앤",
+    "teacher": "강근주, 전유진"
+   }
+  ]
  },
  {
   "id": "c2",
