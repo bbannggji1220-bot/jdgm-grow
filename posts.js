@@ -405,7 +405,13 @@ window.PUBLISHED_CASES = [
  {
   "id": "c8",
   "name": "정보",
-  "posters": []
+  "posters": [
+   {
+    "img": "photos/muq9tik7-pobqp7.jpg",
+    "title": "블록코딩으로 피지컬 컴퓨팅과 웹 개발을 한번에 잡는 정보 수업",
+    "teacher": "고경량"
+   }
+  ]
  },
  {
   "id": "c10",
