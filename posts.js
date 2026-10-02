@@ -485,8 +485,9 @@ window.PUBLISHED_TOOLS = [
   "id": "t1",
   "name": "왓퀴즈",
   "desc": "",
-  "url": "",
-  "posters": []
+  "url": "https://whatquiz.co.kr/",
+  "posters": [],
+  "img": "photos/muqhlq3u-vtu99g.jpg"
  },
  {
   "id": "tmuqhjm2b",
