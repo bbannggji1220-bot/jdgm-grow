@@ -439,6 +439,12 @@ window.PUBLISHED_CASES = [
  {
   "id": "cmuq9wrnv",
   "name": "동아리",
-  "posters": []
+  "posters": [
+   {
+    "img": "photos/muq9xnez-iklqv2.jpg",
+    "title": "원팀으로서 디지털 협업 능력 키우는 창체 동아리",
+    "teacher": "강은희 선생님"
+   }
+  ]
  }
 ];
