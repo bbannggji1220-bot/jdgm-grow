@@ -484,7 +484,7 @@ window.PUBLISHED_TOOLS = [
  {
   "id": "t1",
   "name": "왓퀴즈",
-  "desc": "",
+  "desc": "교사용 AI 업무 비서 플랫폼으로, 생활기록부·행동특성·수업자료·가정통신문·공문서 등 반복 문서 작업을 키워드 입력만으로 빠르게 생성하도록 돕는 서비스",
   "url": "https://whatquiz.co.kr/",
   "posters": [],
   "img": "photos/muqhlq3u-vtu99g.jpg"
