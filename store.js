@@ -34,11 +34,26 @@ const seedTools = () => TOOL_NAMES.map((name, i) => ({ id: "t" + i, name, desc: 
 function getCases() { return window.PUBLISHED_CASES || seedCases(); }
 function getTools() { return window.PUBLISHED_TOOLS || seedTools(); }
 
-function postsJs(posts, banners, cases, tools) {
+// 교사 페이지 '디지털 튜터' 섹션: { intro, period, roles: [{ icon, title, desc }], stats: [{ n, label }], photos: [{ img, title }] }
+const seedTutor = () => ({
+  intro: "디지털 튜터 선생님이 학교의 디지털 기기·교구를 관리하고, AI·디지털 활용 수업에 보조 교사로 함께 들어와 디지털 역량 격차가 큰 학생들을 곁에서 돕습니다.",
+  period: "",
+  roles: [
+    { icon: "🧰", title: "디지털 도구·교구 관리", desc: "태블릿·노트북 등 디지털 기기와 교구를 점검·정리하고, 수업 전에 미리 준비합니다." },
+    { icon: "🤝", title: "AI 활용 수업 보조", desc: "AI·디지털 활용 수업에 보조 교사로 참여해 수업 운영과 기기 사용을 돕습니다." },
+    { icon: "🎯", title: "학생 개별 지원", desc: "디지털 활용이 어려운 학생 곁에서 1:1로 도와 모든 학생이 수업에 참여할 수 있게 합니다." }
+  ],
+  stats: [],
+  photos: []
+});
+function getTutor() { return window.PUBLISHED_TUTOR || seedTutor(); }
+
+function postsJs(posts, banners, cases, tools, tutor) {
   return "// 관리자 페이지에서 저장한 게시본\nwindow.PUBLISHED_POSTS = " + JSON.stringify(posts, null, 1) +
     ";\nwindow.PUBLISHED_BANNERS = " + JSON.stringify(banners, null, 1) +
     ";\nwindow.PUBLISHED_CASES = " + JSON.stringify(cases, null, 1) +
-    ";\nwindow.PUBLISHED_TOOLS = " + JSON.stringify(tools, null, 1) + ";\n";
+    ";\nwindow.PUBLISHED_TOOLS = " + JSON.stringify(tools, null, 1) +
+    ";\nwindow.PUBLISHED_TUTOR = " + JSON.stringify(tutor, null, 1) + ";\n";
 }
 
 // 예전 방식(브라우저 임시 저장)으로 남아 있는 작업본

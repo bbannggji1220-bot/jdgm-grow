@@ -141,6 +141,7 @@ function role(key) {
   });
 
   if ($("#cases-sec")) cases();
+  if ($("#tutor-sec")) tutorSec();
 
   $("#others").innerHTML = ORDER.filter(k => k !== key).map(k => `<a class="btn ghost" href="${k}.html">${ROLES[k].icon} ${ROLES[k].name} 성과 보기</a>`).join("");
 }
@@ -176,6 +177,25 @@ function cases() {
   gallery($("#gal-cases"), getCases(), "수업 사례 포스터가 곧 올라올 예정입니다.");
   gallery($("#gal-tools"), getTools(), "소개와 활용 사례가 곧 올라올 예정입니다.", true);
   if (!$("#cases-sec .cpanel")) $("#cases-sec").remove();
+}
+
+/* ---------- 교사 페이지: 디지털 튜터와 함께하는 수업 ---------- */
+function tutorSec() {
+  const t = getTutor(), el = $("#tutor-sec .tpanel");
+  if (!t.intro && !t.roles.length && !t.photos.length) return $("#tutor-sec").remove();
+  el.innerHTML = `<div class="tsplit">
+    <div class="tintro"><span class="tbadge">DIGITAL TUTOR</span><h2>디지털 튜터와 함께하는 수업</h2>
+      ${t.period ? `<p class="tperiod">${esc(t.period)}</p>` : ""}${t.intro ? `<p class="tdesc">${esc(t.intro)}</p>` : ""}
+      ${t.stats.length ? `<div class="tstats">${t.stats.map(s => `<div><b>${esc(s.n)}</b><small>${esc(s.label)}</small></div>`).join("")}</div>` : ""}</div>
+    <div class="troles">${t.roles.map((r, i) => `<div class="trole"><span class="ticon">${esc(r.icon || "✨")}</span><div><small>ROLE ${String(i + 1).padStart(2, "0")}</small><b>${esc(r.title)}</b><p>${esc(r.desc)}</p></div></div>`).join("")}</div>
+  </div>
+  ${t.photos.length ? `<h3 class="tph">📷 수업 지원 모습</h3><div class="cgrid tgrid">${t.photos.map((p, i) => `<button class="cpost" data-p="${i}"><span class="cimg"><img src="${p.img}" alt="${esc(p.title || "디지털 튜터 수업 지원")}" loading="lazy"></span>
+    ${p.title ? `<span class="ccap"><b>${esc(p.title)}</b></span>` : ""}</button>`).join("")}</div>` : ""}`;
+  el.addEventListener("click", e => {
+    const b = e.target.closest("[data-p]"); if (!b) return;
+    album.imgs = t.photos.map(p => p.img); album.caps = t.photos.map(p => p.title);
+    openAlbum(+b.dataset.p);
+  });
 }
 
 if (page) { header(); modal(); if (page === "home") home(); else role(page); }
