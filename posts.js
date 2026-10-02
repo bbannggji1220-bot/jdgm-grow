@@ -456,7 +456,7 @@ window.PUBLISHED_CASES = [
    {
     "img": "photos/muq9xnez-iklqv2.jpg",
     "title": "원팀으로서 디지털 협업 능력 키우는 창체 동아리",
-    "teacher": "강은희 선생님"
+    "teacher": "강은희"
    }
   ]
  },
