@@ -479,7 +479,7 @@ window.PUBLISHED_TOOLS = [
   "desc": "",
   "url": "https://www.classting.com/",
   "posters": [],
-  "img": "photos/muqhbre2-4ox7nh.jpg"
+  "img": "photos/muqhp3rm-9mu4jv.jpg"
  },
  {
   "id": "t1",
