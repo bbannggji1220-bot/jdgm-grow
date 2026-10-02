@@ -492,7 +492,7 @@ window.PUBLISHED_TOOLS = [
  {
   "id": "tmuqhjm2b",
   "name": "체리스쿨",
-  "desc": "",
+  "desc": "내신 어플 1위! SKY대생의 비법을 그대로 담은 전과목 올인원 앱\n이 앱을 활용하여 사교육을 받기 힘든 학생이나 기초학력 미달 학생들을 대상으로 AI 다짐이라는 자기주도적 학습 프로그램 진행",
   "url": "https://www.mise.team/",
   "posters": [],
   "img": "photos/muqi55pz-drmlg1.jpg"
