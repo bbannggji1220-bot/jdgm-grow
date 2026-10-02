@@ -385,11 +385,6 @@ window.PUBLISHED_CASES = [
   "posters": []
  },
  {
-  "id": "c7",
-  "name": "기술·가정",
-  "posters": []
- },
- {
   "id": "c8",
   "name": "정보",
   "posters": []
