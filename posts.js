@@ -352,7 +352,13 @@ window.PUBLISHED_CASES = [
  {
   "id": "c0",
   "name": "국어",
-  "posters": []
+  "posters": [
+   {
+    "img": "photos/muq9wcu8-g6457r.jpg",
+    "title": "AI와 디지털 도구를 활용한 과정 중심 보고서 쓰기",
+    "teacher": "탁지윤"
+   }
+  ]
  },
  {
   "id": "c1",
