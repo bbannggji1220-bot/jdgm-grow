@@ -487,6 +487,13 @@ window.PUBLISHED_TOOLS = [
   "desc": "",
   "url": "",
   "posters": []
+ },
+ {
+  "id": "tmuqhjm2b",
+  "name": "체리(Chery)",
+  "desc": "",
+  "url": "",
+  "posters": []
  }
 ];
 window.PUBLISHED_TUTOR = {
