@@ -470,8 +470,9 @@ window.PUBLISHED_TOOLS = [
   "id": "t0",
   "name": "클래스팅 AI",
   "desc": "",
-  "url": "",
-  "posters": []
+  "url": "https://www.classting.com/",
+  "posters": [],
+  "img": "photos/muqhbre2-4ox7nh.jpg"
  },
  {
   "id": "t1",
