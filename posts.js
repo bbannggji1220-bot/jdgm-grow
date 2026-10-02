@@ -360,7 +360,7 @@ window.PUBLISHED_CASES = [
   "posters": [
    {
     "img": "photos/muq9o389-82tguz.jpg",
-    "title": "리딩앤",
+    "title": "개별속도로 몰입하고 창의적으로 표현하는 영어수업",
     "teacher": "강근주, 전유진"
    }
   ]
