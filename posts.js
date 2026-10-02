@@ -493,7 +493,7 @@ window.PUBLISHED_TOOLS = [
   "id": "tmuqhjm2b",
   "name": "체리 스쿨",
   "desc": "",
-  "url": "",
+  "url": "https://www.mise.team/",
   "posters": []
  }
 ];
