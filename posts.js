@@ -491,7 +491,7 @@ window.PUBLISHED_TOOLS = [
  },
  {
   "id": "tmuqhjm2b",
-  "name": "체리(Chery)",
+  "name": "체리 스쿨",
   "desc": "",
   "url": "",
   "posters": []
