@@ -36,10 +36,12 @@ window.PUBLISHED_POSTS = [
    "진로"
   ],
   "imgs": [
+   "photos/muqhhpfm-r390e6.jpg",
    "photos/student-1-1.jpg",
    "photos/student-1-2.jpg",
    "photos/student-1-3.jpg"
-  ]
+  ],
+  "cpos": 0
  },
  {
   "id": "student-2",
