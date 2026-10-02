@@ -495,6 +495,13 @@ window.PUBLISHED_TOOLS = [
   "desc": "",
   "url": "https://www.mise.team/",
   "posters": []
+ },
+ {
+  "id": "tmuqhz4wr",
+  "name": "리딩앤",
+  "desc": "",
+  "url": "",
+  "posters": []
  }
 ];
 window.PUBLISHED_TUTOR = {
