@@ -348,3 +348,60 @@ window.PUBLISHED_BANNERS = {
   "img": "photos/mup68x4a-d8utxt.jpg"
  }
 };
+window.PUBLISHED_CASES = [
+ {
+  "id": "c0",
+  "name": "국어",
+  "posters": []
+ },
+ {
+  "id": "c1",
+  "name": "영어",
+  "posters": []
+ },
+ {
+  "id": "c2",
+  "name": "수학",
+  "posters": []
+ },
+ {
+  "id": "c3",
+  "name": "사회",
+  "posters": []
+ },
+ {
+  "id": "c4",
+  "name": "역사",
+  "posters": []
+ },
+ {
+  "id": "c5",
+  "name": "도덕",
+  "posters": []
+ },
+ {
+  "id": "c6",
+  "name": "과학",
+  "posters": []
+ },
+ {
+  "id": "c7",
+  "name": "기술·가정",
+  "posters": []
+ },
+ {
+  "id": "c8",
+  "name": "정보",
+  "posters": []
+ },
+ {
+  "id": "c10",
+  "name": "음악",
+  "posters": []
+ },
+ {
+  "id": "c11",
+  "name": "미술",
+  "posters": []
+ }
+];
