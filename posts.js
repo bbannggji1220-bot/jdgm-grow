@@ -446,5 +446,10 @@ window.PUBLISHED_CASES = [
     "teacher": "강은희 선생님"
    }
   ]
+ },
+ {
+  "id": "cmuq9xulv",
+  "name": "진로",
+  "posters": []
  }
 ];
