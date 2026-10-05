@@ -303,6 +303,7 @@ function renderGal(k) {
   <div class="f"><label>${esc(c.name)} ${G.info ? "활용 사례 사진·포스터" : "포스터"} 올리기 (여러 장 가능 · 첫 번째가 맨 앞에 보입니다)</label><input type="file" data-g="files" accept="image/*" multiple></div>
   <div class="cposters">${c.posters.map((p, i) => `<div class="cpitem"><img src="${src(p.img)}" alt="">
     <input data-pt="${i}" value="${esc(p.title)}" placeholder="${G.ph}"><input data-pc="${i}" value="${esc(p.teacher)}" placeholder="교사명 (선택)">
+    ${G.info ? `<textarea data-pd="${i}" placeholder="사진 설명 (선택 · 어떤 활동인지, 어떻게 활용했는지)">${esc(p.desc)}</textarea>` : ""}
     <div class="bar2"><button class="btn ghost" data-g="pm" data-i="${i}" data-dir="-1" ${i ? "" : "disabled"}>◀</button><button class="btn ghost" data-g="pm" data-i="${i}" data-dir="1" ${i < c.posters.length - 1 ? "" : "disabled"}>▶</button><button class="btn danger" data-g="px" data-i="${i}">삭제</button></div></div>`).join("") || '<p class="note">아직 올린 사진이 없습니다.</p>'}</div>
   <div class="bar2" style="margin-top:16px"><button class="btn primary" data-g="save">${esc(c.name)} 저장</button><button class="btn ghost" data-g="reset">되돌리기</button>${galDirty(k) ? '<span class="note" style="align-self:center;color:#e5484d">저장하지 않은 변경 내용이 있습니다</span>' : ""}</div>`
   : `<p class="note">탭이 없습니다. '＋ ${G.unit} 추가'를 눌러 주세요.</p>`}`;
@@ -346,6 +347,7 @@ function renderGal(k) {
     const t = e.target;
     if (t.dataset.pt != null) c.posters[+t.dataset.pt].title = t.value;
     if (t.dataset.pc != null) c.posters[+t.dataset.pc].teacher = t.value;
+    if (t.dataset.pd != null) c.posters[+t.dataset.pd].desc = t.value;
     if (t.dataset.f) c[t.dataset.f] = t.value;
   };
   box.onchange = async e => {

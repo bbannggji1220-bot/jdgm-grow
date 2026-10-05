@@ -256,3 +256,8 @@
 .tritem .bar2{margin:0;gap:6px;flex-direction:column}
 .tritem .btn{padding:5px 10px;font-size:12px}
 @media (max-width:560px){.tritem{grid-template-columns:50px 1fr}.tritem .bar2{grid-column:1 / -1;flex-direction:row}}
+/* AI 코스웨어 활용: 사진 설명 */
+.ccap .cdesc{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;white-space:pre-wrap;margin-top:4px;font-size:13px;color:var(--muted);line-height:1.6}
+.album figcaption{text-align:center}
+.album figcaption .adesc{display:block;max-width:760px;max-height:7.5em;overflow:auto;margin:6px auto 0;white-space:pre-wrap;font-weight:500;line-height:1.6;opacity:.95}
+.cpitem textarea{font:inherit;font-size:13px;padding:7px 10px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink);width:100%;min-height:64px;resize:vertical}
