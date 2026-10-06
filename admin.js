@@ -135,7 +135,7 @@ function pendingDraft() {
 function render() {
   if (!cur) cur = blank();
   const c = cur, od = token() && pendingDraft();
-  app.innerHTML = `<h1>성과 관리</h1><p class="note">📋 사진은 복사해서 붙여넣을 수도 있습니다: 사진을 넣을 칸 위에 마우스를 올리거나 그 칸을 누른 뒤 <b>Ctrl+V</b></p>${ghBox()}
+  app.innerHTML = `<h1>성과 관리</h1><p class="note">📋 사진은 복사해서 붙여넣을 수도 있습니다: 사진 올리기 칸 아래의 점선 칸을 누른 뒤 <b>Ctrl+V</b> (사진을 끌어다 놓아도 됩니다)</p>${ghBox()}
   ${od ? `<div class="box"><h2>예전 방식으로 저장된 작업본</h2><p class="note" style="margin-bottom:10px">이 브라우저에 예전 방식(임시 저장)으로 저장된 내용이 남아 있습니다${od.posts ? ` (게시물 ${od.posts.length}개)` : ""}. 사이트에 올리면 지금 사이트의 게시물·배너를 이 내용으로 바꿉니다.</p>
     <div class="bar2"><button class="btn primary" id="odup">이 작업본을 사이트에 올리기</button><button class="btn ghost" id="oddel">버리기</button></div></div>` : ""}
   <div class="box"><h2>${posts.some(p => p.id === c.id) ? "성과 수정" : "새 성과 등록"}</h2>
@@ -425,37 +425,73 @@ function shrink(f, max = 1600, q = .82) {
   });
 }
 
-/* ---------- 사진 붙여넣기 (Ctrl+V) ---------- */
-// 마우스가 올라가 있는 곳(없으면 마지막으로 누른 곳)에서 가장 가까운 사진 올리기 칸에 넣습니다.
-// 여러 장 올리는 칸을 우선하고, 넣은 뒤에는 '파일 선택'과 똑같이 처리됩니다.
+/* ---------- 사진 붙여넣기 (Ctrl+V) · 끌어다 놓기 ---------- */
+// 여러 장 올리는 칸 아래마다 '붙여넣기 칸'을 붙입니다. 그 칸을 누른 뒤 Ctrl+V 하거나 사진을 끌어다 놓으면 됩니다.
+// 그 밖에는 마우스가 올라가 있는 곳(없으면 마지막으로 누른 곳)에서 가장 가까운 사진 올리기 칸에 넣습니다.
+// 넣은 뒤에는 '파일 선택'과 똑같이 처리됩니다.
+const ZONE_TEXT = `📋 여기를 누른 뒤 <b>Ctrl+V</b> 로 사진 붙여넣기 · 사진을 여기로 끌어다 놓아도 됩니다`;
+function addPasteZones() {
+  document.querySelectorAll('input[type="file"]:not([hidden]):not([data-pz])').forEach(inp => {
+    inp.dataset.pz = "1";
+    inp.insertAdjacentHTML("afterend", `<div class="pastezone" contenteditable="true" spellcheck="false" role="button" aria-label="사진 붙여넣기 칸">${ZONE_TEXT}</div>`);
+  });
+}
+new MutationObserver(addPasteZones).observe(document.body, { childList: true, subtree: true });
+// 붙여넣기 칸은 Ctrl+V 를 받기 위해 편집 가능한 칸이지만, 글자가 들어가지는 않게 막습니다.
+document.addEventListener("beforeinput", e => { if (e.target.closest && e.target.closest(".pastezone")) e.preventDefault(); });
+document.addEventListener("input", e => { const z = e.target.closest && e.target.closest(".pastezone"); if (z) z.innerHTML = ZONE_TEXT; });
+
 const mouse = { x: -1, y: -1 };
 let lastClick = null;
 document.addEventListener("mousemove", e => { mouse.x = e.clientX; mouse.y = e.clientY; });
 document.addEventListener("mouseleave", () => { mouse.x = mouse.y = -1; });
 document.addEventListener("pointerdown", e => { lastClick = e.target; }, true);
 function pasteInput(from) {
+  if (from && from.classList && from.classList.contains("pastezone")) return from.previousElementSibling;
   for (let el = from; el && el !== document.body; el = el.parentElement) {
     const ins = el.querySelectorAll('input[type="file"]');
     if (ins.length) return [...ins].find(i => i.multiple) || ins[0];
   }
   return null;
 }
-document.addEventListener("paste", e => {
-  const files = [...(e.clipboardData ? e.clipboardData.items : [])].filter(i => i.kind === "file" && i.type.startsWith("image/")).map(i => i.getAsFile()).filter(Boolean);
-  if (!files.length) return;
-  const a = document.activeElement;
-  // 글 칸에서 글자를 붙여넣는 경우는 그대로 둡니다.
-  if (a && a.matches("input:not([type=file]),textarea") && e.clipboardData.types.includes("text/plain")) return;
-  const over = mouse.x >= 0 ? document.elementFromPoint(mouse.x, mouse.y) : null;
-  const inp = pasteInput(over) || (lastClick && document.contains(lastClick) && pasteInput(lastClick)) || (a && a !== document.body && pasteInput(a));
-  if (!inp) return alert("사진을 넣을 칸 위에 마우스를 올린 뒤 다시 Ctrl+V 를 눌러 주세요.");
-  e.preventDefault();
+const imageFiles = list => [...list].filter(f => f && f.type.startsWith("image/"));
+function putFiles(inp, files) {
   // 배너는 고르는 즉시 사이트에 저장되므로 한 번 더 묻습니다.
-  if (inp.dataset.bf && !confirm(`붙여넣은 사진으로 ${ROLES[inp.dataset.bf].name} 배너를 바로 바꿀까요?`)) return;
+  if (inp.dataset.bf && !confirm(`이 사진으로 ${ROLES[inp.dataset.bf].name} 배너를 바로 바꿀까요?`)) return;
   const dt = new DataTransfer();
   (inp.multiple ? files : files.slice(0, 1)).forEach((f, i) => dt.items.add(new File([f], f.name && f.name !== "image.png" ? f.name : `붙여넣은 사진 ${i + 1}.png`, { type: f.type })));
   inp.files = dt.files;
   inp.dispatchEvent(new Event("change", { bubbles: true }));
+}
+document.addEventListener("paste", e => {
+  const cd = e.clipboardData; if (!cd) return;
+  let files = imageFiles([...cd.items].filter(i => i.kind === "file").map(i => i.getAsFile()));
+  if (!files.length) files = imageFiles(cd.files || []);
+  const a = document.activeElement, inZone = a && a.classList.contains("pastezone");
+  if (inZone) e.preventDefault();
+  if (!files.length) {
+    if (inZone) alert("복사한 내용에 사진이 없습니다. 사진 위에서 오른쪽 버튼 → '이미지 복사'를 누른 뒤 다시 붙여넣어 주세요.");
+    return;
+  }
+  // 글 칸에서 글자를 붙여넣는 경우는 그대로 둡니다.
+  if (a && a.matches("input:not([type=file]),textarea") && [...cd.types].includes("text/plain")) return;
+  const over = mouse.x >= 0 ? document.elementFromPoint(mouse.x, mouse.y) : null;
+  const inp = (inZone && pasteInput(a)) || pasteInput(over) ||
+    (lastClick && document.contains(lastClick) && pasteInput(lastClick)) || (a && a !== document.body && pasteInput(a));
+  if (!inp) return alert("사진을 넣을 칸 아래의 '붙여넣기 칸'을 누른 뒤 다시 Ctrl+V 를 눌러 주세요.");
+  e.preventDefault();
+  putFiles(inp, files);
+});
+// 붙여넣기 칸으로 사진 끌어다 놓기
+const zoneOf = e => e.target.closest && e.target.closest(".pastezone");
+document.addEventListener("dragover", e => { const z = zoneOf(e); if (z) { e.preventDefault(); z.classList.add("over"); } });
+document.addEventListener("dragleave", e => { const z = zoneOf(e); if (z) z.classList.remove("over"); });
+document.addEventListener("drop", e => {
+  const z = zoneOf(e); if (!z) return;
+  e.preventDefault(); z.classList.remove("over");
+  const files = imageFiles(e.dataTransfer.files);
+  if (!files.length) return alert("사진 파일만 끌어다 놓을 수 있습니다.");
+  putFiles(pasteInput(z), files);
 });
 
 isAdmin() ? load() : login();
