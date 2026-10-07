@@ -259,10 +259,13 @@
 /* AI 코스웨어 활용: 사진 설명 */
 .ccap .cdesc{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;white-space:pre-wrap;margin-top:4px;font-size:13px;color:var(--muted);line-height:1.6}
 .album figcaption{text-align:center}
-.album figcaption .adesc{display:block;max-width:760px;max-height:7.5em;overflow:auto;margin:6px auto 0;white-space:pre-wrap;font-weight:500;line-height:1.6;opacity:.95}
+.album figcaption .adesc{display:block;max-width:760px;max-height:12em;text-align:left;overflow:auto;margin:6px auto 0;white-space:pre-wrap;font-weight:500;line-height:1.6;opacity:.95}
 .cpitem textarea{font:inherit;font-size:13px;padding:7px 10px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink);width:100%;min-height:64px;resize:vertical}
 /* 관리자: 사진 붙여넣기 칸 */
 .pastezone{caret-color:transparent;margin-top:8px;padding:14px 12px;border:2px dashed var(--line);border-radius:12px;background:var(--bg);color:var(--muted);font-size:13px;text-align:center;cursor:pointer;transition:.15s}
 .pastezone:hover{border-color:var(--brand)}
 .pastezone:focus,.pastezone.over{outline:none;border-color:var(--brand);border-style:solid;color:var(--brand);background:color-mix(in srgb,var(--brand) 8%,var(--surface))}
 .pastezone:focus::after{content:"  ← 지금 Ctrl+V 를 누르세요";font-weight:800}
+
+/* AI 코스웨어: 기능 세부 설명 칸 */
+.cpitem textarea.tall{min-height:120px}

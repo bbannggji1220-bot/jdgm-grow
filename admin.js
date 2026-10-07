@@ -279,8 +279,8 @@ function render() {
 const GAL = {
   cases: { box: "casesBox", title: "📋 수업 사례 공유", label: "수업 사례", unit: "과목", eg: "진로", ph: "수업 주제 (예: AI로 만드는 시)",
     what: "교사 페이지 왼쪽 '수업 사례 공유'에 과목 탭으로 표시됩니다." },
-  tools: { box: "toolsBox", title: "🤖 AI 코스웨어 활용", label: "AI 코스웨어", unit: "코스웨어", eg: "패들렛", ph: "활용 사례 제목 (예: 영어 개별 맞춤 학습)", info: true,
-    what: "교사 페이지 오른쪽 'AI 코스웨어 활용'에 코스웨어 탭으로 표시됩니다. 탭마다 코스웨어 소개와 활용 사례 사진·포스터를 넣을 수 있습니다." }
+  tools: { box: "toolsBox", title: "🤖 AI 코스웨어 활용", label: "AI 코스웨어", unit: "코스웨어", eg: "패들렛", info: true,
+    what: "교사 페이지 오른쪽 'AI 코스웨어 활용'에 코스웨어 탭으로 표시됩니다. 탭마다 코스웨어 소개와, 사진마다 기능 제목·세부 설명을 넣을 수 있습니다." }
 };
 const ged = { cases: { id: null, cur: null }, tools: { id: null, cur: null } }; // 탭별 선택 상태와 저장 전 작업본
 const galSig = x => x ? JSON.stringify([x.posters, x.desc || "", x.url || "", x.img || ""]) : "";
@@ -300,10 +300,11 @@ function renderGal(k) {
     <div class="ctlogo">${c.img ? `<img src="${src(c.img)}" alt=""><button class="rm" data-g="logox" title="로고 빼기">✕</button>` : "<span>🤖</span>"}<label class="note">로고 ${c.img ? "변경" : "올리기"}<input type="file" accept="image/*" data-g="logo" hidden></label></div>
     <div class="ctfields"><input data-f="url" value="${esc(c.url)}" placeholder="사이트 주소 (선택, 예: https://www.classting.com)">
     <textarea data-f="desc" placeholder="${esc(c.name)} 소개 (어떤 코스웨어인지, 수업에서 어떻게 활용했는지)">${esc(c.desc)}</textarea></div></div>` : ""}
-  <div class="f"><label>${esc(c.name)} ${G.info ? "활용 사례 사진·포스터" : "포스터"} 올리기 (여러 장 가능 · 첫 번째가 맨 앞에 보입니다)</label><input type="file" data-g="files" accept="image/*" multiple></div>
+  <div class="f"><label>${esc(c.name)} ${G.info ? "기능 소개 사진" : "포스터"} 올리기 (여러 장 가능 · 첫 번째가 맨 앞에 보입니다)</label><input type="file" data-g="files" accept="image/*" multiple></div>
   <div class="cposters">${c.posters.map((p, i) => `<div class="cpitem"><img src="${src(p.img)}" alt="">
-    <input data-pt="${i}" value="${esc(p.title)}" placeholder="${G.ph}"><input data-pc="${i}" value="${esc(p.teacher)}" placeholder="교사명 (선택)">
-    ${G.info ? `<textarea data-pd="${i}" placeholder="사진 설명 (선택 · 어떤 활동인지, 어떻게 활용했는지)">${esc(p.desc)}</textarea>` : ""}
+    ${G.info // AI 코스웨어: 사진마다 기능 제목 · 세부 설명
+      ? `<input data-pt="${i}" value="${esc(p.title)}" placeholder="기능 제목 (예: AI 맞춤 문제 추천)"><textarea data-pd="${i}" class="tall" placeholder="세부 설명 (이 기능을 어떻게 쓰는지, 수업에서 어떻게 활용했는지)">${esc(p.desc)}</textarea>`
+      : `<input data-pt="${i}" value="${esc(p.title)}" placeholder="${G.ph}"><input data-pc="${i}" value="${esc(p.teacher)}" placeholder="교사명 (선택)">`}
     <div class="bar2"><button class="btn ghost" data-g="pm" data-i="${i}" data-dir="-1" ${i ? "" : "disabled"}>◀</button><button class="btn ghost" data-g="pm" data-i="${i}" data-dir="1" ${i < c.posters.length - 1 ? "" : "disabled"}>▶</button><button class="btn danger" data-g="px" data-i="${i}">삭제</button></div></div>`).join("") || '<p class="note">아직 올린 사진이 없습니다.</p>'}</div>
   <div class="bar2" style="margin-top:16px"><button class="btn primary" data-g="save">${esc(c.name)} 저장</button><button class="btn ghost" data-g="reset">되돌리기</button>${galDirty(k) ? '<span class="note" style="align-self:center;color:#e5484d">저장하지 않은 변경 내용이 있습니다</span>' : ""}</div>`
   : `<p class="note">탭이 없습니다. '＋ ${G.unit} 추가'를 눌러 주세요.</p>`}`;
