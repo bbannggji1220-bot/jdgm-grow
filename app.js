@@ -158,7 +158,7 @@ function gallery(el, list, empty, info) {
       ? `<div class="ctool"><div class="ctop">${c.img ? `<img src="${c.img}" alt="">` : `<span class="clogo">🤖</span>`}<b>${esc(c.name)}</b></div>
         ${c.desc ? `<p>${esc(c.desc)}</p>` : ""}${c.url ? `<a class="btn ghost" href="${esc(webUrl(c.url))}" target="_blank" rel="noopener">사이트 바로가기 ↗</a>` : ""}</div>` : "";
     const grid = n
-      ? `<div class="cgrid${n === 1 ? " one" : ""}">${c.posters.map((p, i) => `<button class="cpost" data-p="${i}"><span class="cimg"><img src="${p.img}" alt="${esc(p.title || c.name)}" loading="lazy"></span>
+      ? `<div class="cgrid${n === 1 ? " one" : ""}${info ? " side" : ""}">${c.posters.map((p, i) => `<button class="cpost" data-p="${i}"><span class="cimg"><img src="${p.img}" alt="${esc(p.title || c.name)}" loading="lazy"></span>
         ${p.title || p.teacher || p.desc ? `<span class="ccap">${p.title ? `<b>${esc(p.title)}</b>` : ""}${p.teacher ? `<small>${esc(p.teacher)}</small>` : ""}${p.desc ? `<span class="cdesc">${esc(p.desc)}</span>` : ""}</span>` : ""}</button>`).join("")}</div>`
       : intro ? "" : `<div class="cempty"><span>${info ? "🤖" : "🗂️"}</span>${esc(c.name)} ${empty}</div>`;
     body.innerHTML = intro + grid;
