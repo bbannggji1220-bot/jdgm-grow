@@ -304,10 +304,10 @@ function renderGal(k) {
     <div class="ctlogo">${c.img ? `<img src="${src(c.img)}" alt=""><button class="rm" data-g="logox" title="로고 빼기">✕</button>` : "<span>🤖</span>"}<label class="note">로고 ${c.img ? "변경" : "올리기"}<input type="file" accept="image/*" data-g="logo" hidden></label></div>
     <div class="ctfields"><input data-f="url" value="${esc(c.url)}" placeholder="사이트 주소 (선택, 예: https://www.classting.com)">
     <textarea data-f="desc" placeholder="${esc(c.name)} 소개 (어떤 코스웨어인지, 수업에서 어떻게 활용했는지)">${esc(c.desc)}</textarea></div></div>` : ""}
-  <div class="f"><label>${esc(c.name)} ${G.info ? "기능 소개 사진" : "포스터"} 올리기 (여러 장 가능 · 첫 번째가 맨 앞에 보입니다)</label><input type="file" data-g="files" accept="image/*" multiple></div>
+  <div class="f"><label>${esc(c.name)} ${G.info ? "기능 소개 사진" : "포스터"} 올리기 (여러 장 가능 · 첫 번째가 맨 앞에 보입니다)</label>${G.info ? `<p class="note" style="margin:-2px 0 4px">💡 붙여넣은 사진은 새 기능 카드가 됩니다. 그 사진을 다른 기능의 <b>＋ 사진</b> 칸으로 끌어다 놓으면 그 기능의 추가 사진으로 옮겨집니다.</p>` : ""}<input type="file" data-g="files" accept="image/*" multiple></div>
   <div class="cposters">${c.posters.map((p, i) => `<div class="cpitem">${G.info // AI 코스웨어: 기능 하나에 사진 여러 장 (첫 장 + 추가 사진 more)
-      ? `<div class="cpimgs">${[p.img, ...(p.more || [])].map((s, j) => `<div><img src="${src(s)}" alt="">${j ? `<button class="rm" data-g="mx" data-i="${i}" data-j="${j - 1}" title="이 사진 빼기">✕</button>` : ""}</div>`).join("")}
-        <label class="addimg" title="이 기능에 사진 추가 (이 카드를 누른 뒤 Ctrl+V 로 붙여넣어도 됩니다)">＋ 사진<input type="file" accept="image/*" multiple hidden data-g="more" data-i="${i}"></label></div>`
+      ? `<div class="cpimgs">${[p.img, ...(p.more || [])].map((s, j) => `<div><img src="${src(s)}" alt="" draggable="true" data-drag="${i}:${j}" title="끌어서 다른 기능의 '＋ 사진' 칸에 놓으면 그 기능의 사진이 됩니다">${j ? `<button class="rm" data-g="mx" data-i="${i}" data-j="${j - 1}" title="이 사진 빼기">✕</button>` : ""}</div>`).join("")}
+        <label class="addimg" data-drop="${i}" title="이 기능에 사진 추가 (사진을 여기로 끌어다 놓아도 됩니다)">＋ 사진<small>여기로 끌어다 놓기</small><input type="file" accept="image/*" multiple hidden data-g="more" data-i="${i}"></label></div>`
       : `<img src="${src(p.img)}" alt="">`}
     ${G.info // AI 코스웨어: 사진마다 기능 제목 · 세부 설명
       ? `<input data-pt="${i}" value="${esc(p.title)}" placeholder="기능 제목 (예: AI 맞춤 문제 추천)"><textarea data-pd="${i}" class="tall" placeholder="세부 설명 (이 기능을 어떻게 쓰는지, 수업에서 어떻게 활용했는지)">${esc(p.desc)}</textarea>`
@@ -358,6 +358,43 @@ function renderGal(k) {
     if (t.dataset.pc != null) c.posters[+t.dataset.pc].teacher = t.value;
     if (t.dataset.pd != null) c.posters[+t.dataset.pd].desc = t.value;
     if (t.dataset.f) c[t.dataset.f] = t.value;
+  };
+  // AI 코스웨어: 사진을 다른 기능의 '+ 사진' 칸으로 끌어다 놓으면 그 기능의 추가 사진으로 옮깁니다. (컴퓨터의 사진 파일도 놓을 수 있음)
+  let drag = null; // [기능 번호, 사진 번호(0 = 첫 사진)]
+  const dropOf = e => G.info && e.target.closest && e.target.closest("[data-drop]");
+  box.ondragstart = e => {
+    const im = e.target.closest && e.target.closest("[data-drag]"); if (!im || !G.info) return;
+    drag = im.dataset.drag.split(":").map(Number);
+    e.dataTransfer.effectAllowed = "move"; e.dataTransfer.setData("text/plain", "");
+    box.classList.add("imgdrag");
+  };
+  box.ondragend = () => { drag = null; box.classList.remove("imgdrag"); box.querySelectorAll(".addimg.over").forEach(x => x.classList.remove("over")); };
+  box.ondragover = e => { const z = dropOf(e); if (!z || (drag && drag[0] === +z.dataset.drop)) return; e.preventDefault(); z.classList.add("over"); };
+  box.ondragleave = e => { const z = dropOf(e); if (z) z.classList.remove("over"); };
+  box.ondrop = async e => {
+    const z = dropOf(e); if (!z) return;
+    e.preventDefault(); z.classList.remove("over");
+    const to = c.posters[+z.dataset.drop];
+    if (drag) {
+      const [fi, fj] = drag, from = c.posters[fi]; drag = null; box.classList.remove("imgdrag");
+      if (from === to) return;
+      let img;
+      if (fj) img = from.more.splice(fj - 1, 1)[0];
+      else if (from.more && from.more.length) { img = from.img; from.img = from.more.shift(); }
+      else {
+        // 사진이 한 장뿐인 카드는 카드째 옮깁니다. 적어 둔 글이 있으면 사라지므로 한 번 묻습니다.
+        if ((from.title || from.desc) && !confirm(`'${from.title || "제목 없음"}' 카드에 적어 둔 기능 제목·설명은 사라집니다. 사진을 옮길까요?`)) return;
+        img = from.img; c.posters.splice(fi, 1);
+      }
+      if (from.more && !from.more.length) delete from.more;
+      (to.more = to.more || []).push(img);
+      return re();
+    }
+    const fs = [...e.dataTransfer.files].filter(f => f.type.startsWith("image/"));
+    if (!fs.length) return;
+    to.more = to.more || [];
+    for (let i = 0; i < fs.length; i++) { busy(`사진 줄이는 중… (${i + 1} / ${fs.length})`); to.more.push(await shrink(fs[i], 2400, .85)); }
+    busy(); re();
   };
   box.onchange = async e => {
     const t = e.target, fs = t.files ? [...t.files] : []; if (!fs.length) return;
