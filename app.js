@@ -158,7 +158,7 @@ function gallery(el, list, empty, info) {
       ? `<div class="ctool"><div class="ctop">${c.img ? `<img src="${c.img}" alt="">` : `<span class="clogo">🤖</span>`}<b>${esc(c.name)}</b></div>
         ${c.desc ? `<p>${esc(c.desc)}</p>` : ""}${c.url ? `<a class="btn ghost" href="${esc(webUrl(c.url))}" target="_blank" rel="noopener">사이트 바로가기 ↗</a>` : ""}</div>` : "";
     const grid = n
-      ? `<div class="cgrid${n === 1 ? " one" : ""}${info ? " side" : ""}">${c.posters.map((p, i) => `<button class="cpost" data-p="${i}"><span class="cimg"><img src="${p.img}" alt="${esc(p.title || c.name)}" loading="lazy"></span>
+      ? `<div class="cgrid${n === 1 ? " one" : ""}${info ? " side" : ""}">${c.posters.map((p, i) => `<button class="cpost" data-p="${i}"><span class="cimg${p.more && p.more.length ? " multi" : ""}">${[p.img, ...(p.more || [])].map(s => `<img src="${s}" alt="${esc(p.title || c.name)}" loading="lazy">`).join("")}</span>
         ${p.title || p.teacher || p.desc ? `<span class="ccap">${p.title ? `<b>${esc(p.title)}</b>` : ""}${p.teacher ? `<small>${esc(p.teacher)}</small>` : ""}${p.desc ? `<span class="cdesc">${esc(p.desc)}</span>` : ""}</span>` : ""}</button>`).join("")}</div>`
       : intro ? "" : `<div class="cempty"><span>${info ? "🤖" : "🗂️"}</span>${esc(c.name)} ${empty}</div>`;
     body.innerHTML = intro + grid;
@@ -168,10 +168,15 @@ function gallery(el, list, empty, info) {
   body.addEventListener("click", e => {
     const b = e.target.closest("[data-p]"); if (!b) return;
     const c = list.find(x => x.id === cur);
-    album.imgs = c.posters.map(p => p.img);
-    album.caps = c.posters.map(p => [p.title, p.teacher].filter(Boolean).join(" · "));
-    album.descs = c.posters.map(p => p.desc || "");
-    openAlbum(+b.dataset.p);
+    // 기능 하나에 사진이 여러 장이면 모두 펼쳐서 넘겨 볼 수 있게 합니다.
+    album.imgs = []; album.caps = []; album.descs = [];
+    let start = 0;
+    c.posters.forEach((p, i) => {
+      const imgs = [p.img, ...(p.more || [])], cap = [p.title, p.teacher].filter(Boolean).join(" · ");
+      if (i === +b.dataset.p) start = album.imgs.length;
+      imgs.forEach((s, j) => { album.imgs.push(s); album.caps.push(cap + (imgs.length > 1 ? ` (${j + 1}/${imgs.length})` : "")); album.descs.push(p.desc || ""); });
+    });
+    openAlbum(start);
   });
 }
 function cases() {

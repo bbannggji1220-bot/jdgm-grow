@@ -27,6 +27,7 @@ async function remote() {
   return { head, posts: w.PUBLISHED_POSTS || seed(), banners: w.PUBLISHED_BANNERS || {}, cases: w.PUBLISHED_CASES || seedCases(), tools: w.PUBLISHED_TOOLS || seedTools(), tutor: w.PUBLISHED_TUTOR || seedTutor() };
 }
 const imgsOf = d => [...d.posts.flatMap(p => p.imgs || []), ...Object.values(d.banners).map(b => b.img).filter(Boolean),
+  ...d.tools.flatMap(c => c.posters.flatMap(p => p.more || [])),
   ...[...d.cases, ...d.tools].flatMap(c => [...c.posters.map(p => p.img), c.img]).filter(Boolean), ...d.tutor.photos.map(p => p.img)];
 const newPath = () => `photos/${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}.jpg`;
 
@@ -51,7 +52,10 @@ async function commit(op, msg) {
     };
     for (const p of d.posts) { const a = []; for (const s of p.imgs || []) a.push(await up(s)); p.imgs = a; }
     for (const b of Object.values(d.banners)) b.img = await up(b.img);
-    for (const c of [...d.cases, ...d.tools]) { for (const p of c.posters) p.img = await up(p.img); if (c.img) c.img = await up(c.img); }
+    for (const c of [...d.cases, ...d.tools]) {
+      for (const p of c.posters) { p.img = await up(p.img); if (p.more) { const a = []; for (const s of p.more) a.push(await up(s)); p.more = a; } }
+      if (c.img) c.img = await up(c.img);
+    }
     for (const p of d.tutor.photos) p.img = await up(p.img);
     const after = new Set(imgsOf(d));
     before.forEach(path => { if (path.startsWith("photos/") && !after.has(path)) tree.push({ path, mode: "100644", type: "blob", sha: null }); });
@@ -301,7 +305,10 @@ function renderGal(k) {
     <div class="ctfields"><input data-f="url" value="${esc(c.url)}" placeholder="사이트 주소 (선택, 예: https://www.classting.com)">
     <textarea data-f="desc" placeholder="${esc(c.name)} 소개 (어떤 코스웨어인지, 수업에서 어떻게 활용했는지)">${esc(c.desc)}</textarea></div></div>` : ""}
   <div class="f"><label>${esc(c.name)} ${G.info ? "기능 소개 사진" : "포스터"} 올리기 (여러 장 가능 · 첫 번째가 맨 앞에 보입니다)</label><input type="file" data-g="files" accept="image/*" multiple></div>
-  <div class="cposters">${c.posters.map((p, i) => `<div class="cpitem"><img src="${src(p.img)}" alt="">
+  <div class="cposters">${c.posters.map((p, i) => `<div class="cpitem">${G.info // AI 코스웨어: 기능 하나에 사진 여러 장 (첫 장 + 추가 사진 more)
+      ? `<div class="cpimgs">${[p.img, ...(p.more || [])].map((s, j) => `<div><img src="${src(s)}" alt="">${j ? `<button class="rm" data-g="mx" data-i="${i}" data-j="${j - 1}" title="이 사진 빼기">✕</button>` : ""}</div>`).join("")}
+        <label class="addimg" title="이 기능에 사진 추가 (이 카드를 누른 뒤 Ctrl+V 로 붙여넣어도 됩니다)">＋ 사진<input type="file" accept="image/*" multiple hidden data-g="more" data-i="${i}"></label></div>`
+      : `<img src="${src(p.img)}" alt="">`}
     ${G.info // AI 코스웨어: 사진마다 기능 제목 · 세부 설명
       ? `<input data-pt="${i}" value="${esc(p.title)}" placeholder="기능 제목 (예: AI 맞춤 문제 추천)"><textarea data-pd="${i}" class="tall" placeholder="세부 설명 (이 기능을 어떻게 쓰는지, 수업에서 어떻게 활용했는지)">${esc(p.desc)}</textarea>`
       : `<input data-pt="${i}" value="${esc(p.title)}" placeholder="${G.ph}"><input data-pc="${i}" value="${esc(p.teacher)}" placeholder="교사명 (선택)">`}
@@ -336,6 +343,7 @@ function renderGal(k) {
     if (g === "pm") { [c.posters[i], c.posters[i + dir]] = [c.posters[i + dir], c.posters[i]]; re(); }
     if (g === "px" && confirm("이 사진을 뺄까요? ('저장'을 눌러야 사이트에 반영됩니다)")) { c.posters.splice(i, 1); re(); }
     if (g === "logox") { delete c.img; re(); }
+    if (g === "mx") { const p = c.posters[i]; p.more.splice(+b.dataset.j, 1); if (!p.more.length) delete p.more; re(); }
     if (g === "save") save(d => {
       let y = d[k].find(y => y.id === c.id);
       if (!y) d[k].push(y = { id: c.id, name: c.name });
@@ -357,6 +365,10 @@ function renderGal(k) {
     if (t.dataset.g === "logo") { busy("로고 줄이는 중…"); c.img = await shrink(fs[0], 600, .9); }
     if (t.dataset.g === "files")
       for (let i = 0; i < fs.length; i++) { busy(`사진 줄이는 중… (${i + 1} / ${fs.length})`); c.posters.push({ img: await shrink(fs[i], 2400, .85), title: "", teacher: "" }); }
+    if (t.dataset.g === "more") {
+      const p = c.posters[+t.dataset.i]; p.more = p.more || [];
+      for (let i = 0; i < fs.length; i++) { busy(`사진 줄이는 중… (${i + 1} / ${fs.length})`); p.more.push(await shrink(fs[i], 2400, .85)); }
+    }
     busy(); re();
   };
 }
