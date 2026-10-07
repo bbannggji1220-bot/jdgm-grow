@@ -289,6 +289,21 @@ const GAL = {
 const ged = { cases: { id: null, cur: null }, tools: { id: null, cur: null } }; // 탭별 선택 상태와 저장 전 작업본
 const galSig = x => x ? JSON.stringify([x.posters, x.desc || "", x.url || "", x.img || ""]) : "";
 const galDirty = k => { const c = ged[k].cur; return !!c && galSig(c) !== galSig(gal[k].find(x => x.id === c.id)); };
+// AI 코스웨어: 기능을 작은 탭으로 늘어놓고, 고른 기능 하나만 크게 엽니다 (왼쪽 사진 · 오른쪽 기능 제목·세부 설명)
+function featEditor(c, st) {
+  const n = c.posters.length;
+  if (!n) return '<p class="note">아직 올린 사진이 없습니다.</p>';
+  const i = st.fi = Math.min(Math.max(st.fi || 0, 0), n - 1), p = c.posters[i];
+  return `<div class="ftabs">${c.posters.map((q, k) => `<div class="ftab${k === i ? " on" : ""}" role="button" data-g="ftab" data-i="${k}" data-drop="${k}" title="눌러서 열기 · 사진을 여기로 끌어다 놓으면 이 기능의 사진이 됩니다">
+    <img src="${src(q.img)}" alt="" draggable="true" data-drag="${k}:0"><span>${k + 1}. ${esc(q.title || "제목 없음")}</span><small>${1 + (q.more || []).length}장</small></div>`).join("")}</div>
+  <div class="fpanel">
+    <div class="cpimgs">${[p.img, ...(p.more || [])].map((s, j) => `<div><img src="${src(s)}" alt="" draggable="true" data-drag="${i}:${j}" title="끌어서 위의 다른 기능 탭에 놓으면 그 기능의 사진이 됩니다">${j ? `<button class="rm" data-g="mx" data-i="${i}" data-j="${j - 1}" title="이 사진 빼기">✕</button>` : ""}</div>`).join("")}
+      <label class="addimg" data-drop="${i}" title="이 기능에 사진 추가 (사진 파일을 여기로 끌어다 놓아도 됩니다)">＋ 사진<small>파일 선택 · 끌어다 놓기</small><input type="file" accept="image/*" multiple hidden data-g="more" data-i="${i}"></label></div>
+    <div class="ffields"><label class="note">기능 제목</label><input data-pt="${i}" value="${esc(p.title)}" placeholder="예: AI 맞춤 문제 추천">
+      <label class="note">세부 설명</label><textarea data-pd="${i}" placeholder="이 기능을 어떻게 쓰는지, 수업에서 어떻게 활용했는지">${esc(p.desc)}</textarea>
+      <div class="bar2"><button class="btn ghost" data-g="pm" data-i="${i}" data-dir="-1" ${i ? "" : "disabled"}>◀ 앞으로</button><button class="btn ghost" data-g="pm" data-i="${i}" data-dir="1" ${i < n - 1 ? "" : "disabled"}>뒤로 ▶</button><button class="btn danger" data-g="px" data-i="${i}">이 기능 삭제</button></div></div>
+  </div>`;
+}
 function renderGal(k) {
   const G = GAL[k], list = gal[k], st = ged[k], box = $("#" + G.box);
   if (!list.some(x => x.id === st.id)) st.id = list.length ? list[0].id : null;
@@ -304,15 +319,10 @@ function renderGal(k) {
     <div class="ctlogo">${c.img ? `<img src="${src(c.img)}" alt=""><button class="rm" data-g="logox" title="로고 빼기">✕</button>` : "<span>🤖</span>"}<label class="note">로고 ${c.img ? "변경" : "올리기"}<input type="file" accept="image/*" data-g="logo" hidden></label></div>
     <div class="ctfields"><input data-f="url" value="${esc(c.url)}" placeholder="사이트 주소 (선택, 예: https://www.classting.com)">
     <textarea data-f="desc" placeholder="${esc(c.name)} 소개 (어떤 코스웨어인지, 수업에서 어떻게 활용했는지)">${esc(c.desc)}</textarea></div></div>` : ""}
-  <div class="f"><label>${esc(c.name)} ${G.info ? "기능 소개 사진" : "포스터"} 올리기 (여러 장 가능 · 첫 번째가 맨 앞에 보입니다)</label>${G.info ? `<p class="note" style="margin:-2px 0 4px">💡 붙여넣은 사진은 새 기능 카드가 됩니다. 그 사진을 다른 기능의 <b>＋ 사진</b> 칸으로 끌어다 놓으면 그 기능의 추가 사진으로 옮겨집니다.</p>` : ""}<input type="file" data-g="files" accept="image/*" multiple></div>
-  <div class="cposters">${c.posters.map((p, i) => `<div class="cpitem">${G.info // AI 코스웨어: 기능 하나에 사진 여러 장 (첫 장 + 추가 사진 more)
-      ? `<div class="cpimgs">${[p.img, ...(p.more || [])].map((s, j) => `<div><img src="${src(s)}" alt="" draggable="true" data-drag="${i}:${j}" title="끌어서 다른 기능의 '＋ 사진' 칸에 놓으면 그 기능의 사진이 됩니다">${j ? `<button class="rm" data-g="mx" data-i="${i}" data-j="${j - 1}" title="이 사진 빼기">✕</button>` : ""}</div>`).join("")}
-        <label class="addimg" data-drop="${i}" title="이 기능에 사진 추가 (사진을 여기로 끌어다 놓아도 됩니다)">＋ 사진<small>여기로 끌어다 놓기</small><input type="file" accept="image/*" multiple hidden data-g="more" data-i="${i}"></label></div>`
-      : `<img src="${src(p.img)}" alt="">`}
-    ${G.info // AI 코스웨어: 사진마다 기능 제목 · 세부 설명
-      ? `<input data-pt="${i}" value="${esc(p.title)}" placeholder="기능 제목 (예: AI 맞춤 문제 추천)"><textarea data-pd="${i}" class="tall" placeholder="세부 설명 (이 기능을 어떻게 쓰는지, 수업에서 어떻게 활용했는지)">${esc(p.desc)}</textarea>`
-      : `<input data-pt="${i}" value="${esc(p.title)}" placeholder="${G.ph}"><input data-pc="${i}" value="${esc(p.teacher)}" placeholder="교사명 (선택)">`}
-    <div class="bar2"><button class="btn ghost" data-g="pm" data-i="${i}" data-dir="-1" ${i ? "" : "disabled"}>◀</button><button class="btn ghost" data-g="pm" data-i="${i}" data-dir="1" ${i < c.posters.length - 1 ? "" : "disabled"}>▶</button><button class="btn danger" data-g="px" data-i="${i}">삭제</button></div></div>`).join("") || '<p class="note">아직 올린 사진이 없습니다.</p>'}</div>
+  <div class="f"><label>${esc(c.name)} ${G.info ? "기능 소개 사진" : "포스터"} 올리기 (여러 장 가능 · 첫 번째가 맨 앞에 보입니다)</label>${G.info ? `<p class="note" style="margin:-2px 0 4px">💡 붙여넣은 사진은 새 기능 탭이 됩니다. 그 사진을 위쪽의 다른 기능 탭으로 끌어다 놓으면 그 기능의 추가 사진으로 옮겨집니다.</p>` : ""}<input type="file" data-g="files" accept="image/*" multiple></div>
+  ${G.info ? featEditor(c, st) : `<div class="cposters">${c.posters.map((p, i) => `<div class="cpitem"><img src="${src(p.img)}" alt="">
+    <input data-pt="${i}" value="${esc(p.title)}" placeholder="${G.ph}"><input data-pc="${i}" value="${esc(p.teacher)}" placeholder="교사명 (선택)">
+    <div class="bar2"><button class="btn ghost" data-g="pm" data-i="${i}" data-dir="-1" ${i ? "" : "disabled"}>◀</button><button class="btn ghost" data-g="pm" data-i="${i}" data-dir="1" ${i < c.posters.length - 1 ? "" : "disabled"}>▶</button><button class="btn danger" data-g="px" data-i="${i}">삭제</button></div></div>`).join("") || '<p class="note">아직 올린 사진이 없습니다.</p>'}</div>`}
   <div class="bar2" style="margin-top:16px"><button class="btn primary" data-g="save">${esc(c.name)} 저장</button><button class="btn ghost" data-g="reset">되돌리기</button>${galDirty(k) ? '<span class="note" style="align-self:center;color:#e5484d">저장하지 않은 변경 내용이 있습니다</span>' : ""}</div>`
   : `<p class="note">탭이 없습니다. '＋ ${G.unit} 추가'를 눌러 주세요.</p>`}`;
 
@@ -322,7 +332,7 @@ function renderGal(k) {
     const g = b.dataset.g, i = +b.dataset.i, dir = +b.dataset.dir;
     if (g === "tab" && b.dataset.id !== st.id) {
       if (galDirty(k) && !confirm("저장하지 않은 변경 내용이 있습니다. 버리고 다른 탭으로 갈까요?")) return;
-      st.id = b.dataset.id; st.cur = null; re();
+      st.id = b.dataset.id; st.cur = null; st.fi = 0; re();
     }
     if (g === "add" && clean()) {
       const name = (prompt(`추가할 ${G.unit} 이름 (예: ${G.eg})`) || "").trim(); if (!name) return;
@@ -340,7 +350,8 @@ function renderGal(k) {
       if (confirm(`'${c.name}' 탭${n ? `과 사진 ${n}장` : ""}을 삭제할까요?`))
         save(d => { d[k] = d[k].filter(y => y.id !== c.id); }, `${G.label} 탭 삭제: ${c.name}`, () => { st.cur = null; });
     }
-    if (g === "pm") { [c.posters[i], c.posters[i + dir]] = [c.posters[i + dir], c.posters[i]]; re(); }
+    if (g === "ftab") { st.fi = i; re(); }
+    if (g === "pm") { [c.posters[i], c.posters[i + dir]] = [c.posters[i + dir], c.posters[i]]; st.fi = i + dir; re(); }
     if (g === "px" && confirm("이 사진을 뺄까요? ('저장'을 눌러야 사이트에 반영됩니다)")) { c.posters.splice(i, 1); re(); }
     if (g === "logox") { delete c.img; re(); }
     if (g === "mx") { const p = c.posters[i]; p.more.splice(+b.dataset.j, 1); if (!p.more.length) delete p.more; re(); }
@@ -354,7 +365,10 @@ function renderGal(k) {
   };
   box.oninput = e => {
     const t = e.target;
-    if (t.dataset.pt != null) c.posters[+t.dataset.pt].title = t.value;
+    if (t.dataset.pt != null) {
+      c.posters[+t.dataset.pt].title = t.value;
+      const tab = G.info && box.querySelector(`.ftab[data-i="${t.dataset.pt}"] span`); if (tab) tab.textContent = `${+t.dataset.pt + 1}. ${t.value || "제목 없음"}`;
+    }
     if (t.dataset.pc != null) c.posters[+t.dataset.pc].teacher = t.value;
     if (t.dataset.pd != null) c.posters[+t.dataset.pd].desc = t.value;
     if (t.dataset.f) c[t.dataset.f] = t.value;
@@ -368,7 +382,7 @@ function renderGal(k) {
     e.dataTransfer.effectAllowed = "move"; e.dataTransfer.setData("text/plain", "");
     box.classList.add("imgdrag");
   };
-  box.ondragend = () => { drag = null; box.classList.remove("imgdrag"); box.querySelectorAll(".addimg.over").forEach(x => x.classList.remove("over")); };
+  box.ondragend = () => { drag = null; box.classList.remove("imgdrag"); box.querySelectorAll(".over").forEach(x => x.classList.remove("over")); };
   box.ondragover = e => { const z = dropOf(e); if (!z || (drag && drag[0] === +z.dataset.drop)) return; e.preventDefault(); z.classList.add("over"); };
   box.ondragleave = e => { const z = dropOf(e); if (z) z.classList.remove("over"); };
   box.ondrop = async e => {
@@ -388,6 +402,7 @@ function renderGal(k) {
       }
       if (from.more && !from.more.length) delete from.more;
       (to.more = to.more || []).push(img);
+      st.fi = c.posters.indexOf(to);
       return re();
     }
     const fs = [...e.dataTransfer.files].filter(f => f.type.startsWith("image/"));
@@ -400,6 +415,7 @@ function renderGal(k) {
     const t = e.target, fs = t.files ? [...t.files] : []; if (!fs.length) return;
     t.value = "";
     if (t.dataset.g === "logo") { busy("로고 줄이는 중…"); c.img = await shrink(fs[0], 600, .9); }
+    if (t.dataset.g === "files") st.fi = c.posters.length;
     if (t.dataset.g === "files")
       for (let i = 0; i < fs.length; i++) { busy(`사진 줄이는 중… (${i + 1} / ${fs.length})`); c.posters.push({ img: await shrink(fs[i], 2400, .85), title: "", teacher: "" }); }
     if (t.dataset.g === "more") {

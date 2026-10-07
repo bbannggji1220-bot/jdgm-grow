@@ -302,3 +302,22 @@
 .cpimgs .addimg small{font-size:10px;font-weight:600;color:var(--muted)}
 .imgdrag .cpimgs .addimg{border-color:var(--brand);background:color-mix(in srgb,var(--brand) 6%,transparent)}
 .cpimgs .addimg.over{border-style:solid;background:color-mix(in srgb,var(--brand) 16%,transparent)}
+/* 관리자 · AI 코스웨어: 기능 탭 + 크게 여는 편집 칸 (왼쪽 사진 · 오른쪽 글) */
+.ftabs{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 12px}
+.ftab{display:flex;align-items:center;gap:8px;max-width:280px;padding:6px 12px 6px 6px;border:1px solid var(--line);border-radius:12px;background:var(--surface);font-size:13px;font-weight:700;cursor:pointer;transition:.15s}
+.ftab:hover{border-color:var(--brand)}
+.ftab img{width:44px;height:32px;flex:none;object-fit:cover;border-radius:6px;cursor:grab}
+.ftab span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ftab small{flex:none;color:var(--muted);font-weight:600}
+.ftab.on{border-color:var(--brand);background:color-mix(in srgb,var(--brand) 10%,var(--surface));color:var(--brand)}
+.imgdrag .ftab:not(.on){border-style:dashed;border-color:var(--brand)}
+.ftab.over{background:color-mix(in srgb,var(--brand) 22%,var(--surface))}
+.fpanel{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.5fr);gap:20px;padding:16px;border:1px solid var(--line);border-radius:16px}
+.fpanel .cpimgs{align-content:start}
+.ffields{display:grid;gap:6px;align-content:start}
+.ffields .note{font-weight:800;color:var(--ink)}
+.ffields input,.ffields textarea{font:inherit;font-size:15px;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);width:100%}
+.ffields input{font-weight:700}
+.ffields textarea{min-height:340px;line-height:1.75;resize:vertical}
+.ffields .bar2{margin-top:6px}
+@media (max-width:700px){.fpanel{grid-template-columns:1fr}.ffields textarea{min-height:240px}}
