@@ -18,6 +18,9 @@ function modal() {
   m.addEventListener("click", e => {
     if (e.target === m || e.target.closest(".x")) m.classList.remove("open");
     if (e.target.closest(".albtn") || e.target.closest(".cover img")) openAlbum(0);
+    const t = e.target.closest(".tour [data-t]"); if (t) showTour(+t.dataset.t);
+    const ti = e.target.closest("[data-ti]");
+    if (ti) { const p = tour.c.posters[tour.i]; album.imgs = [p.img, ...(p.more || [])]; album.caps = album.imgs.map(() => p.title || ""); album.descs = []; openAlbum(+ti.dataset.ti); }
   });
   al.addEventListener("click", e => {
     if (e.target === al || e.target.closest(".ax")) return al.classList.remove("open");
@@ -31,6 +34,10 @@ function modal() {
       if (e.key === "ArrowLeft") showAlbum(album.i - 1);
       if (e.key === "ArrowRight") showAlbum(album.i + 1);
     } else if (e.key === "Escape") m.classList.remove("open");
+    else if (m.classList.contains("open") && $(".tour", m)) {
+      if (e.key === "ArrowLeft" && tour.i > 0) showTour(tour.i - 1);
+      if (e.key === "ArrowRight") showTour(tour.i + 1);
+    }
   });
 }
 const album = { imgs: [], caps: [], descs: [], i: 0 }; // descs: 사진 아래 설명
@@ -62,6 +69,28 @@ function openModal({ badge, title, desc, pts, imgs, color, wide, icon, cpos, cfi
   $(".sheet", m).classList.toggle("wide", !!wide);
   $("#mbody").innerHTML = wide ? `<div class="mgrid"><div class="mside">${side}</div><div class="mtext">${text}</div></div>` : text;
   m.classList.add("open");
+}
+
+/* AI 코스웨어 기능 살펴보기: 기능을 하나씩 순서대로 (왼쪽 사진 · 오른쪽 전체 설명) */
+const tour = { c: null, i: 0 };
+function openTour(c, i) {
+  const m = $("#modal");
+  tour.c = c;
+  m.style.setProperty("--accent", "var(--brand)");
+  $(".sheet", m).classList.add("wide");
+  m.classList.add("open");
+  showTour(i);
+}
+function showTour(i) {
+  const ps = tour.c.posters, n = ps.length;
+  tour.i = (i + n) % n;
+  const p = ps[tour.i], imgs = [p.img, ...(p.more || [])];
+  $("#mbody").innerHTML = `<div class="tour"><span class="badge">${esc(tour.c.name)} 기능 살펴보기</span>
+    <div class="tsteps">${ps.map((q, k) => `<button class="${k === tour.i ? "on" : ""}" data-t="${k}"><b>${k + 1}</b>${esc(q.title || `기능 ${k + 1}`)}</button>`).join("")}</div>
+    <div class="mgrid"><div class="timgs">${imgs.map((s, k) => `<img src="${s}" data-ti="${k}" alt="${esc(p.title || "")}">`).join("")}<small>사진을 누르면 크게 볼 수 있어요</small></div>
+      <div class="mtext"><span class="tno">기능 ${tour.i + 1} / ${n}</span><h3>${esc(p.title || "")}</h3><p class="pre">${esc(p.desc || "")}</p></div></div>
+    <div class="tnav"><button class="btn ghost" data-t="${tour.i - 1}"${tour.i ? "" : " disabled"}>‹ 이전 기능</button><button class="btn" data-t="${tour.i + 1}">${tour.i < n - 1 ? "다음 기능 ›" : "처음으로 ↺"}</button></div></div>`;
+  $(".sheet", $("#modal")).scrollTop = 0;
 }
 
 /* ---------- 홈 ---------- */
@@ -157,8 +186,10 @@ function gallery(el, list, empty, info) {
     const intro = info && (c.desc || c.url || c.img)
       ? `<div class="ctool"><div class="ctop">${c.img ? `<img src="${c.img}" alt="">` : `<span class="clogo">🤖</span>`}<b>${esc(c.name)}</b></div>
         ${c.desc ? `<p>${esc(c.desc)}</p>` : ""}${c.url ? `<a class="btn ghost" href="${esc(webUrl(c.url))}" target="_blank" rel="noopener">사이트 바로가기 ↗</a>` : ""}</div>` : "";
-    const grid = n
-      ? `<div class="cgrid${n === 1 ? " one" : ""}${info ? " side" : ""}">${c.posters.map((p, i) => `<button class="cpost" data-p="${i}"><span class="cimg${p.more && p.more.length ? " multi" : ""}">${[p.img, ...(p.more || [])].map(s => `<img src="${s}" alt="${esc(p.title || c.name)}" loading="lazy">`).join("")}</span>
+    const grid = n && info
+      ? `<button class="tourbtn" data-tour><span class="ti">💡</span><span><b>${esc(c.name)}의 기능이 궁금하다면 클릭!</b><small>기능 ${n}가지를 순서대로 살펴볼 수 있어요</small></span><span class="tgo">›</span></button>`
+      : n
+      ? `<div class="cgrid${n === 1 ? " one" : ""}">${c.posters.map((p, i) => `<button class="cpost" data-p="${i}"><span class="cimg${p.more && p.more.length ? " multi" : ""}">${[p.img, ...(p.more || [])].map(s => `<img src="${s}" alt="${esc(p.title || c.name)}" loading="lazy">`).join("")}</span>
         ${p.title || p.teacher || p.desc ? `<span class="ccap">${p.title ? `<b>${esc(p.title)}</b>` : ""}${p.teacher ? `<small>${esc(p.teacher)}</small>` : ""}${p.desc ? `<span class="cdesc">${esc(p.desc)}</span>` : ""}</span>` : ""}</button>`).join("")}</div>`
       : intro ? "" : `<div class="cempty"><span>${info ? "🤖" : "🗂️"}</span>${esc(c.name)} ${empty}</div>`;
     body.innerHTML = intro + grid;
@@ -166,8 +197,9 @@ function gallery(el, list, empty, info) {
   draw();
   tabs.addEventListener("click", e => { const b = e.target.closest("[data-c]"); if (b) { cur = b.dataset.c; draw(); } });
   body.addEventListener("click", e => {
-    const b = e.target.closest("[data-p]"); if (!b) return;
     const c = list.find(x => x.id === cur);
+    if (e.target.closest("[data-tour]")) return openTour(c, 0);
+    const b = e.target.closest("[data-p]"); if (!b) return;
     // 기능 하나에 사진이 여러 장이면 모두 펼쳐서 넘겨 볼 수 있게 합니다.
     album.imgs = []; album.caps = []; album.descs = [];
     let start = 0;

@@ -258,13 +258,6 @@
 @media (max-width:560px){.tritem{grid-template-columns:50px 1fr}.tritem .bar2{grid-column:1 / -1;flex-direction:row}}
 /* AI 코스웨어 활용: 사진 설명 */
 .ccap .cdesc{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;white-space:pre-wrap;margin-top:4px;font-size:13px;color:var(--muted);line-height:1.6}
-/* AI 코스웨어 활용: 사진 왼쪽 · 글 오른쪽 */
-.cgrid.side,.csplit .cgrid.side{grid-template-columns:1fr}
-.cgrid.side .cpost{flex-direction:row;align-items:stretch}
-.cgrid.side .cimg{flex:0 0 48%;min-width:0;aspect-ratio:4/3;display:flex;align-items:center}
-.cgrid.side .ccap{flex:1;min-width:0;align-content:center;border-top:0;border-left:1px solid var(--line);padding:16px 18px}
-.cgrid.side .cdesc{-webkit-line-clamp:9}
-@media (max-width:560px){.cgrid.side .cimg{flex-basis:42%}.cgrid.side .ccap{padding:10px 12px}.cgrid.side .cdesc{-webkit-line-clamp:6}}
 .album figcaption{text-align:center}
 .album figcaption .adesc{display:block;max-width:760px;max-height:12em;text-align:left;overflow:auto;margin:6px auto 0;white-space:pre-wrap;font-weight:500;line-height:1.6;opacity:.95}
 .cpitem textarea{font:inherit;font-size:13px;padding:7px 10px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink);width:100%;min-height:64px;resize:vertical}
@@ -285,3 +278,21 @@
 .cpimgs .rm{position:absolute;right:-6px;top:-6px;width:22px;height:22px;border-radius:50%;border:0;background:#e5484d;color:#fff;cursor:pointer;font-size:12px}
 .cpimgs .addimg{display:grid;place-items:center;aspect-ratio:4/3;border:2px dashed var(--line);border-radius:8px;color:var(--brand);font-weight:800;font-size:13px;cursor:pointer}
 .cpimgs .addimg:hover{border-color:var(--brand)}
+/* AI 코스웨어: 기능 살펴보기 버튼 · 순서대로 보기 */
+.tourbtn{font:inherit;color:inherit;text-align:left;width:100%;margin-top:16px;display:flex;align-items:center;gap:14px;padding:20px 22px;border-radius:18px;border:2px solid var(--brand);background:color-mix(in srgb,var(--brand) 8%,var(--surface));cursor:pointer;transition:.25s}
+.tourbtn:hover{transform:translateY(-3px);box-shadow:var(--shadow)}
+.tourbtn .ti{font-size:30px}
+.tourbtn b{display:block;font-size:17px;font-weight:900;color:var(--brand)}
+.tourbtn small{color:var(--muted);font-size:13px;font-weight:600}
+.tourbtn .tgo{margin-left:auto;font-size:28px;font-weight:900;color:var(--brand)}
+.tsteps{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0 22px;padding-right:40px}
+.tsteps button{font:inherit;font-size:13px;font-weight:700;display:flex;align-items:center;gap:6px;padding:6px 12px 6px 6px;border-radius:999px;border:1px solid var(--line);background:var(--bg);color:var(--muted);cursor:pointer}
+.tsteps button b{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--surface);color:var(--brand);font-size:12px}
+.tsteps button.on{background:var(--brand);border-color:var(--brand);color:#fff}
+.timgs{display:grid;gap:10px}
+.timgs img{width:100%;border-radius:14px;border:1px solid var(--line);background:var(--bg);cursor:zoom-in;display:block}
+.timgs small{color:var(--muted);font-size:12px;text-align:center}
+.tour .tno{font-size:13px;font-weight:900;color:var(--brand)}
+.tour h3{margin-top:4px}
+.tour .pre{color:var(--ink);font-size:15.5px;line-height:1.8}
+.tnav{display:flex;justify-content:space-between;gap:10px;margin-top:24px;padding-top:18px;border-top:1px solid var(--line)}
