@@ -347,6 +347,20 @@ window.PUBLISHED_POSTS = [
    "photos/mwuobzb9-sde161.jpg",
    "photos/mwuoc0mn-41cwio.jpg"
   ]
+ },
+ {
+  "id": "n1795523593436",
+  "role": "teacher",
+  "s": 3,
+  "e": 12,
+  "title": "수업 공개 및 동료 장학",
+  "desc": "주기적인 수업 공개 및 동료 장학을 통한 ai 및 디지털 활용 수업 공유 및 성찰",
+  "pts": [],
+  "kw": [],
+  "imgs": [
+   "photos/mwuofrcy-k1n5ya.jpg",
+   "photos/mwuofs0u-6te8wx.jpg"
+  ]
  }
 ];
 window.PUBLISHED_BANNERS = {
