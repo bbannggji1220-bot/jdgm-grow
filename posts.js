@@ -138,7 +138,9 @@ window.PUBLISHED_POSTS = [
    "자기주도학습"
   ],
   "imgs": [
-   "photos/muqhgv3f-ki1195.jpg"
+   "photos/muqhgv3f-ki1195.jpg",
+   "photos/mwuoa4fo-7bj5af.jpg",
+   "photos/mwuoa5l3-4jiazb.jpg"
   ],
   "cpos": 0
  },
