@@ -17,7 +17,8 @@ window.PUBLISHED_POSTS = [
    "학년별"
   ],
   "imgs": [
-   "photos/student-0-1.jpg"
+   "photos/student-0-1.jpg",
+   "photos/mwuob5nc-a6n8qe.jpg"
   ]
  },
  {
