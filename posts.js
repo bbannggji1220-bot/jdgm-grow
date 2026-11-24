@@ -115,7 +115,12 @@ window.PUBLISHED_POSTS = [
    "바이브 코딩",
    "캠프"
   ],
-  "imgs": []
+  "imgs": [
+   "photos/mwuo93ge-f6w112.jpg",
+   "photos/mwuo945l-6eo4zy.jpg",
+   "photos/mwuo9541-vszmbz.jpg",
+   "photos/mwuo966o-sy2gzt.jpg"
+  ]
  },
  {
   "id": "student-5",
