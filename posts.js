@@ -343,7 +343,10 @@ window.PUBLISHED_POSTS = [
    "바이브 코딩",
    "체험"
   ],
-  "imgs": []
+  "imgs": [
+   "photos/mwuobzb9-sde161.jpg",
+   "photos/mwuoc0mn-41cwio.jpg"
+  ]
  }
 ];
 window.PUBLISHED_BANNERS = {
