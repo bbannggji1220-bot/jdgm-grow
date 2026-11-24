@@ -85,20 +85,20 @@ window.PUBLISHED_POSTS = [
   "imgs": [
    "photos/student-3-1.jpg",
    "photos/student-3-2.jpg",
-   "photos/student-3-3.jpg",
    "photos/student-3-4.jpg",
    "photos/student-3-5.jpg",
    "photos/student-3-6.jpg",
    "photos/student-3-7.jpg",
-   "photos/student-3-8.jpg",
-   "photos/student-3-9.jpg",
    "photos/student-3-10.jpg",
    "photos/student-3-11.jpg",
-   "photos/student-3-12.jpg",
    "photos/student-3-13.jpg",
-   "photos/student-3-14.jpg",
    "photos/student-3-15.jpg",
-   "photos/student-3-16.jpg"
+   "photos/mwup20kv-uicmg8.jpg",
+   "photos/mwup21zn-kvv4ub.jpg",
+   "photos/mwup2387-jcykha.jpg",
+   "photos/mwup24fr-t5uvwn.jpg",
+   "photos/mwup25kn-lbjwuq.jpg",
+   "photos/mwup26jf-a6v654.jpg"
   ]
  },
  {
